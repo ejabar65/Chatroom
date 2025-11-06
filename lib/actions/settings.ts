@@ -15,7 +15,6 @@ export async function updateUserPreferences(formData: FormData) {
 
   const darkMode = formData.get("darkMode") === "true"
   const layout = formData.get("layout") as string
-  const displayName = formData.get("displayName") as string
 
   // Update user preferences
   const { error: prefError } = await supabase.from("user_preferences").upsert({
@@ -28,15 +27,6 @@ export async function updateUserPreferences(formData: FormData) {
   if (prefError) {
     console.error("[v0] Error updating preferences:", prefError)
     return { success: false, error: prefError.message }
-  }
-
-  // Update display name
-  if (displayName) {
-    const { error: userError } = await supabase.from("users").update({ full_name: displayName }).eq("id", user.id)
-
-    if (userError) {
-      console.error("[v0] Error updating display name:", userError)
-    }
   }
 
   revalidatePath("/")
