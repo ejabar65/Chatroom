@@ -13,6 +13,8 @@ export default async function HomePage() {
 
   const supabase = await createClient()
 
+  const { data: preferences } = await supabase.from("user_preferences").select("layout").eq("user_id", user.id).single()
+
   // Fetch homework posts with user info
   const { data: posts } = await supabase
     .from("homework_posts")
@@ -29,10 +31,10 @@ export default async function HomePage() {
     .order("created_at", { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-purple-950">
       <Header user={user} />
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <HomeworkFeed initialPosts={posts || []} currentUser={user} />
+        <HomeworkFeed initialPosts={posts || []} currentUser={user} layout={preferences?.layout || "card"} />
       </main>
     </div>
   )
