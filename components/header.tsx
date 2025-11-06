@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BookOpen, LogOut, Shield } from "lucide-react"
+import { BookOpen, LogOut, Shield, Settings } from "lucide-react"
 import Link from "next/link"
 
 interface HeaderProps {
@@ -74,6 +74,13 @@ export function Header({ user }: HeaderProps) {
                   <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/settings" className="cursor-pointer">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <form action={signOut}>
                 <DropdownMenuItem asChild>
