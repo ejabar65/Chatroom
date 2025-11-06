@@ -107,10 +107,13 @@ export async function deletePost(postId: string, adminKey?: string) {
       return { success: false, error: "Post not found" }
     }
 
-    const isOwner = post.user_id === user.id
-    const isAdmin = adminKey === ADMIN_KEY
+    const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
-    if (!isOwner && !isAdmin) {
+    const isOwner = post.user_id === user.id
+    const isAdminByKey = adminKey === ADMIN_KEY
+    const isAdminByDb = userProfile?.is_admin === true
+
+    if (!isOwner && !isAdminByKey && !isAdminByDb) {
       return { success: false, error: "Not authorized" }
     }
 
@@ -148,8 +151,13 @@ export async function flagPost(postId: string, reason: string, adminKey: string)
       return { success: false, error: "Not authenticated" }
     }
 
-    if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized - invalid admin key" }
+    const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+
+    const isAdminByKey = adminKey === ADMIN_KEY
+    const isAdminByDb = userProfile?.is_admin === true
+
+    if (!isAdminByKey && !isAdminByDb) {
+      return { success: false, error: "Not authorized - admin access required" }
     }
 
     const { error } = await supabase
@@ -181,8 +189,13 @@ export async function unflagPost(postId: string, adminKey: string) {
       return { success: false, error: "Not authenticated" }
     }
 
-    if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized - invalid admin key" }
+    const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+
+    const isAdminByKey = adminKey === ADMIN_KEY
+    const isAdminByDb = userProfile?.is_admin === true
+
+    if (!isAdminByKey && !isAdminByDb) {
+      return { success: false, error: "Not authorized - admin access required" }
     }
 
     const { error } = await supabase

@@ -55,8 +55,13 @@ export async function flagComment(commentId: string, adminKey: string) {
       return { success: false, error: "Not authenticated" }
     }
 
-    if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized - invalid admin key" }
+    const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+
+    const isAdminByKey = adminKey === ADMIN_KEY
+    const isAdminByDb = userProfile?.is_admin === true
+
+    if (!isAdminByKey && !isAdminByDb) {
+      return { success: false, error: "Not authorized - admin access required" }
     }
 
     const { error } = await supabase.from("comments").update({ is_flagged: true }).eq("id", commentId)
@@ -84,8 +89,13 @@ export async function unflagComment(commentId: string, adminKey: string) {
       return { success: false, error: "Not authenticated" }
     }
 
-    if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized - invalid admin key" }
+    const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+
+    const isAdminByKey = adminKey === ADMIN_KEY
+    const isAdminByDb = userProfile?.is_admin === true
+
+    if (!isAdminByKey && !isAdminByDb) {
+      return { success: false, error: "Not authorized - admin access required" }
     }
 
     const { error } = await supabase.from("comments").update({ is_flagged: false }).eq("id", commentId)
@@ -119,11 +129,13 @@ export async function deleteComment(commentId: string, adminKey?: string) {
       return { success: false, error: "Comment not found" }
     }
 
-    // Check if user owns the comment or has valid admin key
-    const isOwner = comment.user_id === user.id
-    const isAdmin = adminKey === ADMIN_KEY
+    const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
-    if (!isOwner && !isAdmin) {
+    const isOwner = comment.user_id === user.id
+    const isAdminByKey = adminKey === ADMIN_KEY
+    const isAdminByDb = userProfile?.is_admin === true
+
+    if (!isOwner && !isAdminByKey && !isAdminByDb) {
       return { success: false, error: "Not authorized" }
     }
 
