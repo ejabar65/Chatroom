@@ -44,7 +44,7 @@ export async function createComment(postId: string, content: string) {
   }
 }
 
-export async function flagComment(commentId: string, adminKey?: string) {
+export async function flagComment(commentId: string, adminKey: string) {
   try {
     const supabase = await createClient()
 
@@ -56,7 +56,7 @@ export async function flagComment(commentId: string, adminKey?: string) {
     }
 
     if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized" }
+      return { success: false, error: "Not authorized - invalid admin key" }
     }
 
     const { error } = await supabase.from("comments").update({ is_flagged: true }).eq("id", commentId)
@@ -73,7 +73,7 @@ export async function flagComment(commentId: string, adminKey?: string) {
   }
 }
 
-export async function unflagComment(commentId: string, adminKey?: string) {
+export async function unflagComment(commentId: string, adminKey: string) {
   try {
     const supabase = await createClient()
 
@@ -85,7 +85,7 @@ export async function unflagComment(commentId: string, adminKey?: string) {
     }
 
     if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized" }
+      return { success: false, error: "Not authorized - invalid admin key" }
     }
 
     const { error } = await supabase.from("comments").update({ is_flagged: false }).eq("id", commentId)

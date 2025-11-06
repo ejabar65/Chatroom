@@ -137,7 +137,7 @@ export async function deletePost(postId: string, adminKey?: string) {
   }
 }
 
-export async function flagPost(postId: string, reason: string, adminKey?: string) {
+export async function flagPost(postId: string, reason: string, adminKey: string) {
   try {
     const supabase = await createClient()
 
@@ -149,7 +149,7 @@ export async function flagPost(postId: string, reason: string, adminKey?: string
     }
 
     if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized" }
+      return { success: false, error: "Not authorized - invalid admin key" }
     }
 
     const { error } = await supabase
@@ -170,7 +170,7 @@ export async function flagPost(postId: string, reason: string, adminKey?: string
   }
 }
 
-export async function unflagPost(postId: string, adminKey?: string) {
+export async function unflagPost(postId: string, adminKey: string) {
   try {
     const supabase = await createClient()
 
@@ -182,7 +182,7 @@ export async function unflagPost(postId: string, adminKey?: string) {
     }
 
     if (adminKey !== ADMIN_KEY) {
-      return { success: false, error: "Not authorized" }
+      return { success: false, error: "Not authorized - invalid admin key" }
     }
 
     const { error } = await supabase
