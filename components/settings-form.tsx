@@ -15,14 +15,12 @@ export function SettingsForm({ user, preferences }: { user: any; preferences: an
   const [loading, setLoading] = useState(false)
   const [darkMode, setDarkMode] = useState(preferences?.dark_mode ?? false)
   const [layout, setLayout] = useState(preferences?.layout ?? "card")
-  const [displayName, setDisplayName] = useState(user.full_name || "")
 
   const handleSave = async () => {
     setLoading(true)
     const formData = new FormData()
     formData.append("darkMode", darkMode.toString())
     formData.append("layout", layout)
-    formData.append("displayName", displayName)
 
     await updateUserPreferences(formData)
 
@@ -65,29 +63,6 @@ export function SettingsForm({ user, preferences }: { user: any; preferences: an
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">Choose how posts are displayed in your feed</p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Profile */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Profile</h2>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="display-name">Display Name</Label>
-            <Input
-              id="display-name"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your name"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={user.email} disabled />
-            <p className="text-sm text-muted-foreground">Email cannot be changed</p>
           </div>
         </div>
       </Card>
