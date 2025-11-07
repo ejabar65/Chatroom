@@ -170,7 +170,7 @@ export function UsersIcon({ className }: { className?: string }) {
 export function TrendingUpIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/placeholder.svg?height=24&width=24"
+      src="/trending-up-arrow-icon-flat-green.jpg"
       alt="Trending"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -181,7 +181,7 @@ export function TrendingUpIcon({ className }: { className?: string }) {
 export function MessageSquareIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/placeholder.svg?height=24&width=24"
+      src="/comment-message-square-icon-flat-blue.jpg"
       alt="Comment"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -196,7 +196,7 @@ export function MessageIcon({ className }: { className?: string }) {
 export function FileTextIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/placeholder.svg?height=24&width=24"
+      src="/file-document-text-icon-flat-blue.jpg"
       alt="File"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -211,7 +211,7 @@ export function FileIcon({ className }: { className?: string }) {
 export function FlagIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/placeholder.svg?height=24&width=24"
+      src="/flag-report-icon-flat-red.jpg"
       alt="Flag"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -222,7 +222,7 @@ export function FlagIcon({ className }: { className?: string }) {
 export function CheckCircleIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/placeholder.svg?height=24&width=24"
+      src="/check-circle-success-icon-flat-green.jpg"
       alt="Success"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -233,7 +233,7 @@ export function CheckCircleIcon({ className }: { className?: string }) {
 export function CheckIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/placeholder.svg?height=24&width=24"
+      src="/checkmark-tick-icon-flat-green.jpg"
       alt="Check"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
