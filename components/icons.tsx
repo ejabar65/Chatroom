@@ -1,7 +1,7 @@
 export function BookOpenIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/book-open-icon.jpg"
+      src="/open-book-education-icon-flat-blue.jpg"
       alt="Book"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -12,7 +12,7 @@ export function BookOpenIcon({ className }: { className?: string }) {
 export function MessageCircleIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/message-circle-chat-icon.jpg"
+      src="/chat-message-bubble-icon-flat-blue.jpg"
       alt="Message"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -23,7 +23,7 @@ export function MessageCircleIcon({ className }: { className?: string }) {
 export function AlertTriangleIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/alert-warning-triangle-icon.jpg"
+      src="/warning-alert-triangle-icon-flat-orange.jpg"
       alt="Alert"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -38,7 +38,7 @@ export function AlertIcon({ className }: { className?: string }) {
 export function UploadIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/upload-cloud-icon.jpg"
+      src="/upload-cloud-arrow-icon-flat-blue.jpg"
       alt="Upload"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -49,7 +49,7 @@ export function UploadIcon({ className }: { className?: string }) {
 export function XIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/close-x-icon.jpg"
+      src="/close-x-cancel-icon-flat-red.jpg"
       alt="Close"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -60,7 +60,7 @@ export function XIcon({ className }: { className?: string }) {
 export function LoaderIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/loading-spinner-icon.jpg"
+      src="/loading-spinner-circular-icon-flat-blue.jpg"
       alt="Loading"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -71,7 +71,7 @@ export function LoaderIcon({ className }: { className?: string }) {
 export function PlusIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/plus-add-icon.jpg"
+      src="/add-plus-create-icon-flat-blue.jpg"
       alt="Add"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -82,7 +82,7 @@ export function PlusIcon({ className }: { className?: string }) {
 export function ArrowLeftIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/arrow-left-back-icon.jpg"
+      src="/arrow-left-back-icon-flat-blue.jpg"
       alt="Back"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -93,7 +93,7 @@ export function ArrowLeftIcon({ className }: { className?: string }) {
 export function SendIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/send-paper-plane-icon.jpg"
+      src="/send-paper-plane-icon-flat-blue.jpg"
       alt="Send"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -104,7 +104,7 @@ export function SendIcon({ className }: { className?: string }) {
 export function TrashIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/trash-delete-bin-icon.jpg"
+      src="/trash-delete-bin-icon-flat-red.jpg"
       alt="Delete"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -115,7 +115,7 @@ export function TrashIcon({ className }: { className?: string }) {
 export function LogOutIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/logout-exit-sign-out-icon.jpg"
+      src="/logout-exit-sign-out-icon-flat-blue.jpg"
       alt="Logout"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -126,7 +126,7 @@ export function LogOutIcon({ className }: { className?: string }) {
 export function ShieldIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/shield-admin-security-icon.jpg"
+      src="/shield-admin-security-icon-flat-blue.jpg"
       alt="Admin"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -137,7 +137,7 @@ export function ShieldIcon({ className }: { className?: string }) {
 export function SettingsIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/settings-gear-cog-icon.jpg"
+      src="/settings-gear-cog-icon-flat-blue.jpg"
       alt="Settings"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -148,7 +148,7 @@ export function SettingsIcon({ className }: { className?: string }) {
 export function GridIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/grid-apps-menu-icon.jpg"
+      src="/grid-apps-menu-icon-flat-blue.jpg"
       alt="Boards"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
@@ -159,7 +159,7 @@ export function GridIcon({ className }: { className?: string }) {
 export function UsersIcon({ className }: { className?: string }) {
   return (
     <img
-      src="/users-people-group-icon.jpg"
+      src="/users-people-group-icon-flat-blue.jpg"
       alt="Users"
       className={className}
       style={{ width: "1.5rem", height: "1.5rem" }}
