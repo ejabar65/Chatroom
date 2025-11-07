@@ -32,7 +32,6 @@ export default async function CommunityPage({
     .match({ community_id: communityData.id, user_id: user.id })
     .single()
 
-  // Fetch posts for this community
   const { data: posts } = await supabase
     .from("homework_posts")
     .select(`
@@ -48,10 +47,34 @@ export default async function CommunityPage({
     .eq("community_id", communityData.id)
     .order("created_at", { ascending: false })
 
+  // Fetch member roles for each post author
+  const postsWithRoles = await Promise.all(
+    (posts || []).map(async (post) => {
+      const { data: memberData } = await supabase
+        .from("community_members")
+        .select("role")
+        .match({ community_id: communityData.id, user_id: post.user_id })
+        .single()
+
+      return {
+        ...post,
+        users: {
+          ...post.users,
+          memberRole: memberData?.role || null,
+        },
+      }
+    }),
+  )
+
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      <CommunityFeed community={communityData} posts={posts || []} currentUser={user} isMember={!!membership} />
+      <CommunityFeed
+        community={communityData}
+        posts={postsWithRoles || []}
+        currentUser={user}
+        isMember={!!membership}
+      />
     </div>
   )
 }

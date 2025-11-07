@@ -22,6 +22,7 @@ interface Post {
     full_name: string | null
     avatar_url: string | null
     email: string
+    memberRole?: string | null // Added member role
   }
   communities?: {
     id: string
@@ -86,6 +87,24 @@ export function HomeworkFeed({ initialPosts, currentUser, layout = "card" }: Hom
   )
 }
 
+function getRoleBadge(role: string | null | undefined) {
+  if (!role || role === "member") return null
+
+  const roleConfig = {
+    admin: { label: "Admin", variant: "destructive" as const },
+    moderator: { label: "Mod", variant: "default" as const },
+  }
+
+  const config = roleConfig[role as keyof typeof roleConfig]
+  if (!config) return null
+
+  return (
+    <Badge variant={config.variant} className="text-xs">
+      {config.label}
+    </Badge>
+  )
+}
+
 function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: string; is_admin: boolean } }) {
   return (
     <div className="space-y-4">
@@ -117,6 +136,7 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                         </Link>
                       )}
                       <p className="font-medium text-sm">{post.users.full_name || "Student"}</p>
+                      {getRoleBadge(post.users.memberRole)}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
@@ -205,6 +225,7 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                   </div>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span>{post.users.full_name || "Student"}</span>
+                    {getRoleBadge(post.users.memberRole)}
                     <span>•</span>
                     <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
                     <span>•</span>
@@ -260,7 +281,10 @@ function CompactLayout({ posts, currentUser }: { posts: Post[]; currentUser: { i
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground shrink-0">
-                  <span>{post.users.full_name || "Student"}</span>
+                  <div className="flex items-center gap-1">
+                    <span>{post.users.full_name || "Student"}</span>
+                    {getRoleBadge(post.users.memberRole)}
+                  </div>
                   <span className="flex items-center gap-1">
                     <MessageCircleIcon className="w-3 h-3" />
                     {commentCount}

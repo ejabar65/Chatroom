@@ -16,7 +16,6 @@ export default async function HomePage() {
 
   const { data: preferences } = await supabase.from("user_preferences").select("layout").eq("user_id", user.id).single()
 
-  // Fetch homework posts with user info and community
   const { data: posts } = await supabase
     .from("homework_posts")
     .select(`
@@ -36,6 +35,28 @@ export default async function HomePage() {
     `)
     .order("created_at", { ascending: false })
 
+  // Fetch member roles for each post author in their respective communities
+  const postsWithRoles = await Promise.all(
+    (posts || []).map(async (post) => {
+      if (post.community_id && post.user_id) {
+        const { data: memberData } = await supabase
+          .from("community_members")
+          .select("role")
+          .match({ community_id: post.community_id, user_id: post.user_id })
+          .single()
+
+        return {
+          ...post,
+          users: {
+            ...post.users,
+            memberRole: memberData?.role || null,
+          },
+        }
+      }
+      return post
+    }),
+  )
+
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
@@ -43,7 +64,11 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main feed */}
           <div className="lg:col-span-3">
-            <HomeworkFeed initialPosts={posts || []} currentUser={user} layout={preferences?.layout || "card"} />
+            <HomeworkFeed
+              initialPosts={postsWithRoles || []}
+              currentUser={user}
+              layout={preferences?.layout || "card"}
+            />
           </div>
 
           {/* Sidebar */}
