@@ -23,6 +23,11 @@ interface Post {
     avatar_url: string | null
     email: string
   }
+  communities?: {
+    id: string
+    name: string
+    display_name: string
+  } | null
   comments: { count: number }[]
 }
 
@@ -103,7 +108,16 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                     <AvatarFallback className="bg-primary/10 text-primary">{initials}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium text-sm">{post.users.full_name || "Student"}</p>
+                    <div className="flex items-center gap-2">
+                      {post.communities && (
+                        <Link href={`/c/${post.communities.name}`}>
+                          <Badge variant="outline" className="text-xs hover:bg-accent cursor-pointer">
+                            c/{post.communities.name}
+                          </Badge>
+                        </Link>
+                      )}
+                      <p className="font-medium text-sm">{post.users.full_name || "Student"}</p>
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                     </p>

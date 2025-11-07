@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser } from "@/lib/actions/auth"
 import { HomeworkFeed } from "@/components/homework-feed"
 import { Header } from "@/components/header"
+import { CommunitiesSidebar } from "@/components/communities-sidebar"
 import { redirect } from "next/navigation"
 
 export default async function HomePage() {
@@ -15,7 +16,7 @@ export default async function HomePage() {
 
   const { data: preferences } = await supabase.from("user_preferences").select("layout").eq("user_id", user.id).single()
 
-  // Fetch homework posts with user info
+  // Fetch homework posts with user info and community
   const { data: posts } = await supabase
     .from("homework_posts")
     .select(`
@@ -26,16 +27,31 @@ export default async function HomePage() {
         avatar_url,
         email
       ),
+      communities:community_id (
+        id,
+        name,
+        display_name
+      ),
       comments (count)
     `)
     .order("created_at", { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-purple-950">
+    <div className="min-h-screen bg-background">
       <Header user={user} />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <HomeworkFeed initialPosts={posts || []} currentUser={user} layout={preferences?.layout || "card"} />
-      </main>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main feed */}
+          <div className="lg:col-span-3">
+            <HomeworkFeed initialPosts={posts || []} currentUser={user} layout={preferences?.layout || "card"} />
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <CommunitiesSidebar userId={user.id} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

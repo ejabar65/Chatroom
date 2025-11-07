@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BookOpen, LogOut, Shield, Settings } from "lucide-react"
+import { BookOpen, LogOut, Shield, Settings, Grid3x3 } from "lucide-react"
 import Link from "next/link"
 
 interface HeaderProps {
@@ -34,13 +34,22 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-6xl">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <h1 className="text-xl font-bold text-foreground">Homework Helper</h1>
-        </Link>
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <h1 className="text-xl font-bold text-foreground">Homework Helper</h1>
+          </Link>
+
+          <Link href="/communities">
+            <Button variant="ghost" size="sm">
+              <Grid3x3 className="w-4 h-4 mr-2" />
+              Boards
+            </Button>
+          </Link>
+        </div>
 
         <div className="flex items-center gap-4">
           {user.is_admin && (
