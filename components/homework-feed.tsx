@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MessageCircle, AlertTriangle, BookOpen } from "lucide-react"
+import { MessageCircleIcon, AlertTriangleIcon, BookOpenIcon } from "@/components/icons"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 
@@ -62,7 +62,7 @@ export function HomeworkFeed({ initialPosts, currentUser, layout = "card" }: Hom
   if (posts.length === 0) {
     return (
       <div className="text-center py-12">
-        <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+        <BookOpenIcon className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
         <h2 className="text-2xl font-semibold mb-2">No homework posts yet</h2>
         <p className="text-muted-foreground mb-6">Be the first to ask for help!</p>
         <Link href="/post/new">
@@ -131,7 +131,7 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                   )}
                   {post.is_flagged && currentUser.is_admin && (
                     <Badge variant="destructive" className="text-xs">
-                      <AlertTriangle className="w-3 h-3 mr-1" />
+                      <AlertTriangleIcon className="w-3 h-3 mr-1" />
                       Flagged
                     </Badge>
                   )}
@@ -154,7 +154,7 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
             <CardFooter className="pt-3">
               <Link href={`/post/${post.id}`} className="w-full">
                 <Button variant="outline" className="w-full bg-transparent">
-                  <MessageCircle className="w-4 h-4 mr-2" />
+                  <MessageCircleIcon className="w-4 h-4 mr-2" />
                   {commentCount === 0
                     ? "Be the first to help"
                     : `${commentCount} ${commentCount === 1 ? "response" : "responses"}`}
@@ -199,7 +199,7 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                     )}
                     {post.is_flagged && currentUser.is_admin && (
                       <Badge variant="destructive" className="text-xs shrink-0">
-                        <AlertTriangle className="w-3 h-3" />
+                        <AlertTriangleIcon className="w-3 h-3" />
                       </Badge>
                     )}
                   </div>
@@ -209,7 +209,7 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                     <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
-                      <MessageCircle className="w-3 h-3" />
+                      <MessageCircleIcon className="w-3 h-3" />
                       {commentCount}
                     </span>
                   </div>
@@ -253,7 +253,7 @@ function CompactLayout({ posts, currentUser }: { posts: Post[]; currentUser: { i
                     )}
                     {post.is_flagged && currentUser.is_admin && (
                       <Badge variant="destructive" className="text-xs shrink-0">
-                        <AlertTriangle className="w-3 h-3" />
+                        <AlertTriangleIcon className="w-3 h-3" />
                       </Badge>
                     )}
                   </div>
@@ -262,7 +262,7 @@ function CompactLayout({ posts, currentUser }: { posts: Post[]; currentUser: { i
                 <div className="flex items-center gap-4 text-xs text-muted-foreground shrink-0">
                   <span>{post.users.full_name || "Student"}</span>
                   <span className="flex items-center gap-1">
-                    <MessageCircle className="w-3 h-3" />
+                    <MessageCircleIcon className="w-3 h-3" />
                     {commentCount}
                   </span>
                   <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>

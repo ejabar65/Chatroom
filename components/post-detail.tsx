@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Send, Trash2, AlertTriangle } from "lucide-react"
+import { ArrowLeftIcon, SendIcon, TrashIcon, AlertTriangleIcon } from "@/components/icons"
 import { formatDistanceToNow } from "date-fns"
 import { createComment } from "@/lib/actions/comments"
 import { deletePost } from "@/lib/actions/posts"
@@ -114,13 +114,13 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
       <div className="flex items-center justify-between">
         <Link href="/">
           <Button variant="ghost" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeftIcon className="w-4 h-4 mr-2" />
             Back to Feed
           </Button>
         </Link>
         {canDelete && (
           <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isDeleting}>
-            <Trash2 className="w-4 h-4 mr-2" />
+            <TrashIcon className="w-4 h-4 mr-2" />
             Delete
           </Button>
         )}
@@ -145,7 +145,7 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
               {post.subject && <Badge variant="secondary">{post.subject}</Badge>}
               {post.is_flagged && currentUser.is_admin && (
                 <Badge variant="destructive">
-                  <AlertTriangle className="w-3 h-3 mr-1" />
+                  <AlertTriangleIcon className="w-3 h-3 mr-1" />
                   Flagged
                 </Badge>
               )}
@@ -184,7 +184,7 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                 disabled={isSubmitting || !comment.trim()}
                 className="bg-indigo-600 hover:bg-indigo-700"
               >
-                <Send className="w-4 h-4 mr-2" />
+                <SendIcon className="w-4 h-4 mr-2" />
                 Post Response
               </Button>
             </div>

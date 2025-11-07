@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BookOpen, LogOut, Shield, Settings, Grid3x3 } from "lucide-react"
+import { BookOpenIcon, LogOutIcon, ShieldIcon, SettingsIcon, GridIcon } from "@/components/icons"
 import Link from "next/link"
 
 interface HeaderProps {
@@ -38,14 +38,14 @@ export function Header({ user }: HeaderProps) {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-primary-foreground" />
+              <BookOpenIcon className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-bold text-foreground">Homework Helper</h1>
           </Link>
 
           <Link href="/communities">
             <Button variant="ghost" size="sm">
-              <Grid3x3 className="w-4 h-4 mr-2" />
+              <GridIcon className="w-4 h-4 mr-2" />
               Boards
             </Button>
           </Link>
@@ -55,7 +55,7 @@ export function Header({ user }: HeaderProps) {
           {user.is_admin && (
             <Link href="/admin">
               <Button variant="outline" size="sm">
-                <Shield className="w-4 h-4 mr-2" />
+                <ShieldIcon className="w-4 h-4 mr-2" />
                 Admin
               </Button>
             </Link>
@@ -86,7 +86,7 @@ export function Header({ user }: HeaderProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/settings" className="cursor-pointer">
-                  <Settings className="w-4 h-4 mr-2" />
+                  <SettingsIcon className="w-4 h-4 mr-2" />
                   Settings
                 </Link>
               </DropdownMenuItem>
@@ -94,7 +94,7 @@ export function Header({ user }: HeaderProps) {
               <form action={signOut}>
                 <DropdownMenuItem asChild>
                   <button type="submit" className="w-full cursor-pointer">
-                    <LogOut className="w-4 h-4 mr-2" />
+                    <LogOutIcon className="w-4 h-4 mr-2" />
                     Sign out
                   </button>
                 </DropdownMenuItem>
