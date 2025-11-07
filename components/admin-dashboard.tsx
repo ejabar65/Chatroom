@@ -10,7 +10,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { AlertTriangle, Users, FileText, MessageCircle, Flag, Trash2, Shield, CheckCircle } from "lucide-react"
+import {
+  AlertIcon,
+  UsersIcon,
+  FileIcon,
+  MessageIcon,
+  FlagIcon,
+  TrashIcon,
+  ShieldIcon,
+  CheckIcon,
+} from "@/components/icons"
 import { formatDistanceToNow } from "date-fns"
 import { flagPost, unflagPost, deletePost } from "@/lib/actions/posts"
 import { flagComment, unflagComment, deleteComment } from "@/lib/actions/comments"
@@ -141,7 +150,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center">
-          <Shield className="w-6 h-6 text-white" />
+          <ShieldIcon className="w-6 h-6 text-white" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
@@ -157,7 +166,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-indigo-600" />
+              <UsersIcon className="w-5 h-5 text-indigo-600" />
               <span className="text-2xl font-bold">{stats.totalUsers}</span>
             </div>
           </CardContent>
@@ -169,7 +178,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileIcon className="w-5 h-5 text-blue-600" />
               <span className="text-2xl font-bold">{stats.totalPosts}</span>
             </div>
           </CardContent>
@@ -181,7 +190,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <AlertIcon className="w-5 h-5 text-red-600" />
               <span className="text-2xl font-bold">{stats.flaggedPosts}</span>
             </div>
           </CardContent>
@@ -193,7 +202,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-green-600" />
+              <MessageIcon className="w-5 h-5 text-green-600" />
               <span className="text-2xl font-bold">{stats.totalComments}</span>
             </div>
           </CardContent>
@@ -205,7 +214,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <Flag className="w-5 h-5 text-orange-600" />
+              <FlagIcon className="w-5 h-5 text-orange-600" />
               <span className="text-2xl font-bold">{stats.flaggedComments}</span>
             </div>
           </CardContent>
@@ -250,7 +259,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                       {post.subject && <Badge variant="secondary">{post.subject}</Badge>}
                       {post.is_flagged && (
                         <Badge variant="destructive">
-                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          <AlertIcon className="w-3 h-3 mr-1" />
                           Flagged
                         </Badge>
                       )}
@@ -290,18 +299,18 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                         size={1}
                       />
                       <Button variant="outline" size="sm" onClick={() => handleFlagPost(post.id)}>
-                        <Flag className="w-4 h-4 mr-2" />
+                        <FlagIcon className="w-4 h-4 mr-2" />
                         Flag
                       </Button>
                     </>
                   ) : (
                     <Button variant="outline" size="sm" onClick={() => handleUnflagPost(post.id)}>
-                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <CheckIcon className="w-4 h-4 mr-2" />
                       Unflag
                     </Button>
                   )}
                   <Button variant="destructive" size="sm" onClick={() => handleDeletePost(post.id)}>
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <TrashIcon className="w-4 h-4 mr-2" />
                     Delete
                   </Button>
                 </CardFooter>
@@ -338,7 +347,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                     </div>
                     {comment.is_flagged && (
                       <Badge variant="destructive">
-                        <AlertTriangle className="w-3 h-3 mr-1" />
+                        <AlertIcon className="w-3 h-3 mr-1" />
                         Flagged
                       </Badge>
                     )}
@@ -364,17 +373,17 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                   </Link>
                   {!comment.is_flagged ? (
                     <Button variant="outline" size="sm" onClick={() => handleFlagComment(comment.id)}>
-                      <Flag className="w-4 h-4 mr-2" />
+                      <FlagIcon className="w-4 h-4 mr-2" />
                       Flag
                     </Button>
                   ) : (
                     <Button variant="outline" size="sm" onClick={() => handleUnflagComment(comment.id)}>
-                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <CheckIcon className="w-4 h-4 mr-2" />
                       Unflag
                     </Button>
                   )}
                   <Button variant="destructive" size="sm" onClick={() => handleDeleteComment(comment.id)}>
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <TrashIcon className="w-4 h-4 mr-2" />
                     Delete
                   </Button>
                 </CardFooter>
@@ -414,7 +423,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                                 </div>
                               </div>
                               <Badge variant="destructive">
-                                <AlertTriangle className="w-3 h-3 mr-1" />
+                                <AlertIcon className="w-3 h-3 mr-1" />
                                 Flagged Post
                               </Badge>
                             </div>
@@ -435,11 +444,11 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                               </Button>
                             </Link>
                             <Button variant="outline" size="sm" onClick={() => handleUnflagPost(post.id)}>
-                              <CheckCircle className="w-4 h-4 mr-2" />
+                              <CheckIcon className="w-4 h-4 mr-2" />
                               Unflag
                             </Button>
                             <Button variant="destructive" size="sm" onClick={() => handleDeletePost(post.id)}>
-                              <Trash2 className="w-4 h-4 mr-2" />
+                              <TrashIcon className="w-4 h-4 mr-2" />
                               Delete
                             </Button>
                           </CardFooter>
@@ -479,7 +488,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                                 </div>
                               </div>
                               <Badge variant="destructive">
-                                <AlertTriangle className="w-3 h-3 mr-1" />
+                                <AlertIcon className="w-3 h-3 mr-1" />
                                 Flagged Comment
                               </Badge>
                             </div>
@@ -494,11 +503,11 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
                               </Button>
                             </Link>
                             <Button variant="outline" size="sm" onClick={() => handleUnflagComment(comment.id)}>
-                              <CheckCircle className="w-4 h-4 mr-2" />
+                              <CheckIcon className="w-4 h-4 mr-2" />
                               Unflag
                             </Button>
                             <Button variant="destructive" size="sm" onClick={() => handleDeleteComment(comment.id)}>
-                              <Trash2 className="w-4 h-4 mr-2" />
+                              <TrashIcon className="w-4 h-4 mr-2" />
                               Delete
                             </Button>
                           </CardFooter>
@@ -511,7 +520,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
 
             {stats.flaggedPosts === 0 && stats.flaggedComments === 0 && (
               <div className="text-center py-12">
-                <CheckCircle className="w-16 h-16 mx-auto text-green-600 mb-4" />
+                <CheckIcon className="w-16 h-16 mx-auto text-green-600 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">All Clear!</h3>
                 <p className="text-muted-foreground">No flagged content to review</p>
               </div>

@@ -25,6 +25,10 @@ export function AlertTriangleIcon({ className }: { className?: string }) {
   )
 }
 
+export function AlertIcon({ className }: { className?: string }) {
+  return <AlertTriangleIcon className={className} />
+}
+
 export function UploadIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -98,9 +102,7 @@ export function TrashIcon({ className }: { className?: string }) {
 export function LogOutIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   )
 }
@@ -108,7 +110,7 @@ export function LogOutIcon({ className }: { className?: string }) {
 export function ShieldIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   )
 }
@@ -161,6 +163,10 @@ export function MessageSquareIcon({ className }: { className?: string }) {
   )
 }
 
+export function MessageIcon({ className }: { className?: string }) {
+  return <MessageSquareIcon className={className} />
+}
+
 export function FileTextIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -171,6 +177,10 @@ export function FileTextIcon({ className }: { className?: string }) {
       <polyline points="10 9 9 9 8 9" />
     </svg>
   )
+}
+
+export function FileIcon({ className }: { className?: string }) {
+  return <FileTextIcon className={className} />
 }
 
 export function FlagIcon({ className }: { className?: string }) {
@@ -187,6 +197,14 @@ export function CheckCircleIcon({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+  )
+}
+
+export function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polyline points="20 6 9 17 4 12" />
     </svg>
   )
 }
