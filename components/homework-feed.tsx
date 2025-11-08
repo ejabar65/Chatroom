@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MessageCircleIcon, AlertTriangleIcon, BookOpenIcon } from "@/components/icons"
+import { MessageCircleIcon, AlertTriangleIcon, BookOpenIcon, CrownIcon } from "@/components/icons"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 
@@ -105,6 +105,10 @@ function getRoleBadge(role: string | null | undefined) {
   )
 }
 
+function isAdmin(role: string | null | undefined): boolean {
+  return role === "admin"
+}
+
 function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: string; is_admin: boolean } }) {
   return (
     <div className="space-y-4">
@@ -122,10 +126,17 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={post.users.avatar_url || undefined} />
-                    <AvatarFallback className="bg-primary/10 text-primary">{initials}</AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar>
+                      <AvatarImage src={post.users.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary/10 text-primary">{initials}</AvatarFallback>
+                    </Avatar>
+                    {isAdmin(post.users.memberRole) && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                        <CrownIcon className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </div>
                   <div>
                     <div className="flex items-center gap-2">
                       {post.communities && (
@@ -135,7 +146,11 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                           </Badge>
                         </Link>
                       )}
-                      <p className="font-medium text-sm">{post.users.full_name || "Student"}</p>
+                      <p
+                        className={`font-medium text-sm ${isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400" : ""}`}
+                      >
+                        {post.users.full_name || "Student"}
+                      </p>
                       {getRoleBadge(post.users.memberRole)}
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -204,10 +219,17 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
           <Link key={post.id} href={`/post/${post.id}`}>
             <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center gap-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={post.users.avatar_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary">{initials}</AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={post.users.avatar_url || undefined} />
+                    <AvatarFallback className="bg-primary/10 text-primary">{initials}</AvatarFallback>
+                  </Avatar>
+                  {isAdmin(post.users.memberRole) && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                      <CrownIcon className="w-2.5 h-2.5 text-white" />
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -224,7 +246,13 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{post.users.full_name || "Student"}</span>
+                    <span
+                      className={
+                        isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""
+                      }
+                    >
+                      {post.users.full_name || "Student"}
+                    </span>
                     {getRoleBadge(post.users.memberRole)}
                     <span>•</span>
                     <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
@@ -282,7 +310,13 @@ function CompactLayout({ posts, currentUser }: { posts: Post[]; currentUser: { i
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground shrink-0">
                   <div className="flex items-center gap-1">
-                    <span>{post.users.full_name || "Student"}</span>
+                    <span
+                      className={
+                        isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""
+                      }
+                    >
+                      {post.users.full_name || "Student"}
+                    </span>
                     {getRoleBadge(post.users.memberRole)}
                   </div>
                   <span className="flex items-center gap-1">

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { MessageCircle, AlertTriangle } from "lucide-react"
+import { CrownIcon } from "@/components/icons"
 import Link from "next/link"
 import { joinCommunity, leaveCommunity } from "@/lib/actions/communities"
 import { useRouter } from "next/navigation"
@@ -27,6 +28,10 @@ function getRoleBadge(role: string | null | undefined) {
       {config.label}
     </Badge>
   )
+}
+
+function isAdmin(role: string | null | undefined): boolean {
+  return role === "admin"
 }
 
 export function CommunityFeed({
@@ -112,13 +117,24 @@ function CardLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
         <Link key={post.id} href={`/post/${post.id}`}>
           <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex gap-4">
-              <Avatar>
-                <AvatarImage src={post.users.avatar_url || "/placeholder.svg"} />
-                <AvatarFallback>{post.users.full_name?.[0] || post.users.email[0]}</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar>
+                  <AvatarImage src={post.users.avatar_url || "/placeholder.svg"} />
+                  <AvatarFallback>{post.users.full_name?.[0] || post.users.email[0]}</AvatarFallback>
+                </Avatar>
+                {isAdmin(post.users.memberRole) && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                    <CrownIcon className="w-3 h-3 text-white" />
+                  </div>
+                )}
+              </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium">{post.users.full_name || post.users.email}</span>
+                  <span
+                    className={`font-medium ${isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400" : ""}`}
+                  >
+                    {post.users.full_name || post.users.email}
+                  </span>
                   {getRoleBadge(post.users.memberRole)}
                   <span className="text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
@@ -164,10 +180,17 @@ function ListLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
           <Link key={post.id} href={`/post/${post.id}`}>
             <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center gap-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={post.users.avatar_url || undefined} />
-                  <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={post.users.avatar_url || undefined} />
+                    <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                  </Avatar>
+                  {isAdmin(post.users.memberRole) && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                      <CrownIcon className="w-2.5 h-2.5 text-white" />
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -184,7 +207,13 @@ function ListLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{post.users.full_name || "Student"}</span>
+                    <span
+                      className={
+                        isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""
+                      }
+                    >
+                      {post.users.full_name || "Student"}
+                    </span>
                     {getRoleBadge(post.users.memberRole)}
                     <span>•</span>
                     <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
@@ -242,7 +271,13 @@ function CompactLayout({ posts, currentUser }: { posts: any[]; currentUser: any 
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground shrink-0">
                   <div className="flex items-center gap-1">
-                    <span>{post.users.full_name || "Student"}</span>
+                    <span
+                      className={
+                        isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""
+                      }
+                    >
+                      {post.users.full_name || "Student"}
+                    </span>
                     {getRoleBadge(post.users.memberRole)}
                   </div>
                   <span className="flex items-center gap-1">

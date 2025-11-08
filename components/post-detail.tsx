@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeftIcon, SendIcon, TrashIcon, AlertTriangleIcon } from "@/components/icons"
+import { ArrowLeftIcon, SendIcon, TrashIcon, AlertTriangleIcon, CrownIcon } from "@/components/icons"
 import { formatDistanceToNow } from "date-fns"
 import { createComment } from "@/lib/actions/comments"
 import { deletePost } from "@/lib/actions/posts"
@@ -25,6 +25,7 @@ interface Comment {
     full_name: string | null
     avatar_url: string | null
     email: string
+    is_admin: boolean
   }
 }
 
@@ -41,6 +42,7 @@ interface Post {
     full_name: string | null
     avatar_url: string | null
     email: string
+    is_admin: boolean
   }
   comments: Comment[]
 }
@@ -51,6 +53,10 @@ interface PostDetailProps {
     id: string
     is_admin: boolean
   }
+}
+
+function isAdmin(user: any): boolean {
+  return user?.is_admin === true
 }
 
 export function PostDetail({ post, currentUser }: PostDetailProps) {
@@ -130,12 +136,21 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={post.users.avatar_url || undefined} />
-                <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={post.users.avatar_url || undefined} />
+                  <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                </Avatar>
+                {isAdmin(post.users) && (
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                    <CrownIcon className="w-3.5 h-3.5 text-white" />
+                  </div>
+                )}
+              </div>
               <div>
-                <p className="font-medium">{post.users.full_name || "Student"}</p>
+                <p className={`font-medium ${isAdmin(post.users) ? "text-yellow-600 dark:text-yellow-400" : ""}`}>
+                  {post.users.full_name || "Student"}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                 </p>
@@ -207,13 +222,24 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
 
                   return (
                     <div key={comment.id} className="flex gap-3 p-4 rounded-lg bg-muted/50">
-                      <Avatar>
-                        <AvatarImage src={comment.users.avatar_url || undefined} />
-                        <AvatarFallback className="bg-indigo-100 text-indigo-700">{commentInitials}</AvatarFallback>
-                      </Avatar>
+                      <div className="relative">
+                        <Avatar>
+                          <AvatarImage src={comment.users.avatar_url || undefined} />
+                          <AvatarFallback className="bg-indigo-100 text-indigo-700">{commentInitials}</AvatarFallback>
+                        </Avatar>
+                        {isAdmin(comment.users) && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                            <CrownIcon className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </div>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm">{comment.users.full_name || "Student"}</p>
+                          <p
+                            className={`font-medium text-sm ${isAdmin(comment.users) ? "text-yellow-600 dark:text-yellow-400" : ""}`}
+                          >
+                            {comment.users.full_name || "Student"}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                           </p>

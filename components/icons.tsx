@@ -22,6 +22,8 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline"
 
+import { TrophyIcon } from "@heroicons/react/24/solid"
+
 export { BookOpenIcon }
 export { PlusIcon }
 export { ArrowLeftIcon }
@@ -30,6 +32,10 @@ export { UsersIcon }
 export { FlagIcon }
 export { CheckCircleIcon }
 export { CheckIcon }
+
+export function CrownIcon({ className }: { className?: string }) {
+  return <TrophyIcon className={className} />
+}
 
 export function MessageCircleIcon({ className }: { className?: string }) {
   return <ChatBubbleLeftIcon className={className} />
