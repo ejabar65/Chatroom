@@ -46,15 +46,20 @@ export function MusicSidebar() {
   // Initialize player
   useEffect(() => {
     if (playerReady && !playerRef.current && isOpen) {
+      console.log("[v0] Initializing YouTube player")
       playerRef.current = new window.YT.Player("youtube-player", {
         height: "0",
         width: "0",
         playerVars: {
-          autoplay: 0,
+          autoplay: 1, // Changed from 0 to 1 to enable autoplay
           controls: 0,
         },
         events: {
+          onReady: (event: any) => {
+            console.log("[v0] YouTube player ready")
+          },
           onStateChange: (event: any) => {
+            console.log("[v0] Player state:", event.data)
             if (event.data === window.YT.PlayerState.ENDED) {
               handleNext()
             }
@@ -64,6 +69,9 @@ export function MusicSidebar() {
             if (event.data === window.YT.PlayerState.PAUSED) {
               setIsPlaying(false)
             }
+          },
+          onError: (event: any) => {
+            console.error("[v0] YouTube player error:", event.data)
           },
         },
       })
@@ -75,10 +83,12 @@ export function MusicSidebar() {
 
     setIsLoading(true)
     try {
+      console.log("[v0] Searching for:", searchQuery)
       const response = await fetch(`/api/music/search?q=${encodeURIComponent(searchQuery)}`)
       const data = await response.json()
 
       if (response.ok) {
+        console.log("[v0] Found tracks:", data.tracks.length)
         setSearchResults(data.tracks)
       } else {
         console.error("[v0] Search error:", data.error)
@@ -96,6 +106,7 @@ export function MusicSidebar() {
       queueId: `${track.id}-${Date.now()}`,
       addedAt: Date.now(),
     }
+    console.log("[v0] Adding to queue:", queueItem.title)
     setQueue((prev) => [...prev, queueItem])
 
     // If nothing is playing, start playing this track
@@ -105,16 +116,23 @@ export function MusicSidebar() {
   }
 
   const playTrack = (track: QueueItem) => {
+    console.log("[v0] Playing track:", track.title, "Video ID:", track.videoId)
     setCurrentTrack(track)
     if (playerRef.current && playerRef.current.loadVideoById) {
       playerRef.current.loadVideoById(track.videoId)
       setIsPlaying(true)
+    } else {
+      console.error("[v0] Player not ready")
     }
   }
 
   const togglePlayPause = () => {
-    if (!playerRef.current) return
+    if (!playerRef.current) {
+      console.error("[v0] Player not initialized")
+      return
+    }
 
+    console.log("[v0] Toggle play/pause, current state:", isPlaying)
     if (isPlaying) {
       playerRef.current.pauseVideo()
     } else {
@@ -294,7 +312,7 @@ export function MusicSidebar() {
         </div>
 
         {/* Hidden YouTube Player */}
-        <div id="youtube-player" className="hidden" />
+        <div id="youtube-player" style={{ width: 0, height: 0, overflow: "hidden" }} />
       </div>
     </>
   )
