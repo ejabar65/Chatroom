@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/actions/auth"
 import { HomeworkFeed } from "@/components/homework-feed"
 import { Header } from "@/components/header"
 import { CommunitiesSidebar } from "@/components/communities-sidebar"
+import { MusicSidebar } from "@/components/music-sidebar"
 import { redirect } from "next/navigation"
 
 export default async function HomePage() {
@@ -77,6 +78,8 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+      {/* Music Sidebar */}
+      <MusicSidebar />
     </div>
   )
 }
