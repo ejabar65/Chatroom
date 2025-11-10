@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import {
   MagnifyingGlassIcon,
   PlayIcon,
-  PauseIcon,
   ForwardIcon,
   XMarkIcon,
   PlusIcon,
@@ -18,6 +17,7 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/outline"
 import type { Track, QueueItem } from "@/lib/types/music"
+import { VinylPlayer } from "@/components/vinyl-player"
 
 interface ContextMenu {
   x: number
@@ -241,30 +241,19 @@ export function MusicSidebar() {
           </div>
 
           {currentTrack && (
-            <div className="flex-shrink-0 m-4 mb-0">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <img
-                      src={currentTrack.thumbnail || "/placeholder.svg"}
-                      alt={currentTrack.title}
-                      className="w-16 h-16 rounded object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{currentTrack.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 justify-center">
-                    <Button onClick={togglePlayPause} size="icon" variant="outline">
-                      {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
-                    </Button>
-                    <Button onClick={handleNext} size="icon" variant="outline">
-                      <ForwardIcon className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="flex-shrink-0 border-b border-border">
+              <VinylPlayer
+                isPlaying={isPlaying}
+                thumbnail={currentTrack.thumbnail}
+                title={currentTrack.title}
+                artist={currentTrack.artist}
+                onTogglePlay={togglePlayPause}
+              />
+              <div className="flex gap-2 justify-center pb-4">
+                <Button onClick={handleNext} size="icon" variant="outline">
+                  <ForwardIcon className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           )}
 
