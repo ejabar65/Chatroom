@@ -224,7 +224,7 @@ export function MusicSidebar() {
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b border-border">
+          <div className="flex-shrink-0 p-4 border-b border-border">
             <h2 className="text-xl font-bold mb-4">Music Player</h2>
 
             <div className="flex gap-2">
@@ -241,117 +241,128 @@ export function MusicSidebar() {
           </div>
 
           {currentTrack && (
-            <Card className="m-4 mb-0">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <img
-                    src={currentTrack.thumbnail || "/placeholder.svg"}
-                    alt={currentTrack.title}
-                    className="w-16 h-16 rounded object-cover"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">{currentTrack.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
+            <div className="flex-shrink-0 m-4 mb-0">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={currentTrack.thumbnail || "/placeholder.svg"}
+                      alt={currentTrack.title}
+                      className="w-16 h-16 rounded object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{currentTrack.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={togglePlayPause} size="icon" variant="outline">
-                    {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
-                  </Button>
-                  <Button onClick={handleNext} size="icon" variant="outline">
-                    <ForwardIcon className="h-5 w-5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="flex gap-2 justify-center">
+                    <Button onClick={togglePlayPause} size="icon" variant="outline">
+                      {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
+                    </Button>
+                    <Button onClick={handleNext} size="icon" variant="outline">
+                      <ForwardIcon className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
-          <ScrollArea className="flex-1 p-4">
-            {searchResults.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3">Search Results</h3>
-                <div className="space-y-2">
-                  {searchResults.map((track) => (
-                    <Card
-                      key={track.id}
-                      className="hover:bg-accent transition-colors cursor-pointer"
-                      onContextMenu={(e) => handleContextMenu(e, track, "search")}
-                    >
-                      <CardContent className="p-3">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={track.thumbnail || "/placeholder.svg"}
-                            alt={track.title}
-                            className="w-12 h-12 rounded object-cover"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{track.title}</p>
-                            <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-                          </div>
-                          <Button onClick={() => addToQueue(track)} size="icon" variant="ghost">
-                            <PlusIcon className="h-5 w-5" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {queue.length > 0 && (
-              <div>
-                <h3 className="font-semibold mb-3">Queue ({queue.length})</h3>
-                <div className="space-y-2">
-                  {queue.map((track, index) => (
-                    <Card
-                      key={track.queueId}
-                      className={`hover:bg-accent transition-colors cursor-pointer ${
-                        currentTrack?.queueId === track.queueId ? "border-primary" : ""
-                      }`}
-                      onContextMenu={(e) => handleContextMenu(e, track, "queue")}
-                    >
-                      <CardContent className="p-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-muted-foreground w-4">{index + 1}</span>
-                          <img
-                            src={track.thumbnail || "/placeholder.svg"}
-                            alt={track.title}
-                            className="w-10 h-10 rounded object-cover"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{track.title}</p>
-                            <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-                          </div>
-                          <div className="flex gap-1">
-                            {currentTrack?.queueId !== track.queueId && (
-                              <Button onClick={() => playTrack(track)} size="icon" variant="ghost" className="h-8 w-8">
-                                <PlayIcon className="h-4 w-4" />
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4">
+                {searchResults.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold mb-3">Search Results</h3>
+                    <div className="space-y-2">
+                      {searchResults.map((track) => (
+                        <Card
+                          key={track.id}
+                          className="hover:bg-accent transition-colors cursor-pointer"
+                          onContextMenu={(e) => handleContextMenu(e, track, "search")}
+                        >
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={track.thumbnail || "/placeholder.svg"}
+                                alt={track.title}
+                                className="w-12 h-12 rounded object-cover"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm truncate">{track.title}</p>
+                                <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+                              </div>
+                              <Button onClick={() => addToQueue(track)} size="icon" variant="ghost">
+                                <PlusIcon className="h-5 w-5" />
                               </Button>
-                            )}
-                            <Button
-                              onClick={() => removeFromQueue(track.queueId)}
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                            >
-                              <XMarkIcon className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {searchResults.length === 0 && queue.length === 0 && (
-              <div className="text-center text-muted-foreground py-12">
-                <p>Search for music to get started!</p>
+                {queue.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-3">Queue ({queue.length})</h3>
+                    <div className="space-y-2">
+                      {queue.map((track, index) => (
+                        <Card
+                          key={track.queueId}
+                          className={`hover:bg-accent transition-colors cursor-pointer ${
+                            currentTrack?.queueId === track.queueId ? "border-primary" : ""
+                          }`}
+                          onContextMenu={(e) => handleContextMenu(e, track, "queue")}
+                        >
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-muted-foreground w-4">{index + 1}</span>
+                              <img
+                                src={track.thumbnail || "/placeholder.svg"}
+                                alt={track.title}
+                                className="w-10 h-10 rounded object-cover"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm truncate">{track.title}</p>
+                                <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+                              </div>
+                              <div className="flex gap-1">
+                                {currentTrack?.queueId !== track.queueId && (
+                                  <Button
+                                    onClick={() => playTrack(track)}
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8"
+                                  >
+                                    <PlayIcon className="h-4 w-4" />
+                                  </Button>
+                                )}
+                                <Button
+                                  onClick={() => removeFromQueue(track.queueId)}
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-8 w-8"
+                                >
+                                  <XMarkIcon className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {searchResults.length === 0 && queue.length === 0 && (
+                  <div className="text-center text-muted-foreground py-12">
+                    <p>Search for music to get started!</p>
+                  </div>
+                )}
               </div>
-            )}
-          </ScrollArea>
+            </ScrollArea>
+          </div>
         </div>
 
         <div id="youtube-player" style={{ width: 0, height: 0, overflow: "hidden" }} />
