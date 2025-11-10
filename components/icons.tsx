@@ -32,6 +32,7 @@ export { UsersIcon }
 export { FlagIcon }
 export { CheckCircleIcon }
 export { CheckIcon }
+export { ArrowPathIcon } // Export ArrowPathIcon from outline
 
 export function CrownIcon({ className }: { className?: string }) {
   return <TrophyIcon className={className} />

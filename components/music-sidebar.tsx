@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,8 +15,16 @@ import {
   XMarkIcon,
   PlusIcon,
   Bars3Icon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline"
 import type { Track, QueueItem } from "@/lib/types/music"
+
+interface ContextMenu {
+  x: number
+  y: number
+  track: Track | QueueItem
+  type: "search" | "queue"
+}
 
 export function MusicSidebar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -26,8 +36,8 @@ export function MusicSidebar() {
   const [isLoading, setIsLoading] = useState(false)
   const playerRef = useRef<any>(null)
   const [playerReady, setPlayerReady] = useState(false)
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null)
 
-  // Load YouTube IFrame API
   useEffect(() => {
     if (typeof window !== "undefined" && !window.YT) {
       const tag = document.createElement("script")
@@ -43,7 +53,6 @@ export function MusicSidebar() {
     }
   }, [])
 
-  // Initialize player
   useEffect(() => {
     if (playerReady && !playerRef.current && isOpen) {
       console.log("[v0] Initializing YouTube player")
@@ -51,7 +60,7 @@ export function MusicSidebar() {
         height: "0",
         width: "0",
         playerVars: {
-          autoplay: 1, // Changed from 0 to 1 to enable autoplay
+          autoplay: 1,
           controls: 0,
         },
         events: {
@@ -109,7 +118,6 @@ export function MusicSidebar() {
     console.log("[v0] Adding to queue:", queueItem.title)
     setQueue((prev) => [...prev, queueItem])
 
-    // If nothing is playing, start playing this track
     if (!currentTrack) {
       playTrack(queueItem)
     }
@@ -162,9 +170,46 @@ export function MusicSidebar() {
     setQueue((prev) => prev.filter((t) => t.queueId !== queueId))
   }
 
+  const shuffleQueue = () => {
+    const shuffled = [...queue].sort(() => Math.random() - 0.5)
+    setQueue(shuffled)
+  }
+
+  const playNow = (track: Track | QueueItem) => {
+    const queueItem: QueueItem =
+      "queueId" in track
+        ? track
+        : {
+            ...track,
+            queueId: `${track.id}-${Date.now()}`,
+            addedAt: Date.now(),
+          }
+
+    if (!("queueId" in track)) {
+      setQueue((prev) => [queueItem, ...prev])
+    }
+
+    playTrack(queueItem)
+  }
+
+  const handleContextMenu = (e: React.MouseEvent, track: Track | QueueItem, type: "search" | "queue") => {
+    e.preventDefault()
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      track,
+      type,
+    })
+  }
+
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null)
+    document.addEventListener("click", handleClick)
+    return () => document.removeEventListener("click", handleClick)
+  }, [])
+
   return (
     <>
-      {/* Floating toggle button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-4 right-4 z-50 h-14 w-14 rounded-full shadow-lg"
@@ -173,18 +218,15 @@ export function MusicSidebar() {
         {isOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
       </Button>
 
-      {/* Sidebar */}
       <div
         className={`fixed top-0 right-0 h-screen w-96 bg-background border-l border-border shadow-2xl z-40 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Header */}
           <div className="p-4 border-b border-border">
             <h2 className="text-xl font-bold mb-4">Music Player</h2>
 
-            {/* Search */}
             <div className="flex gap-2">
               <Input
                 placeholder="Search for music..."
@@ -198,7 +240,6 @@ export function MusicSidebar() {
             </div>
           </div>
 
-          {/* Current Track & Controls */}
           {currentTrack && (
             <Card className="m-4 mb-0">
               <CardContent className="p-4">
@@ -225,15 +266,17 @@ export function MusicSidebar() {
             </Card>
           )}
 
-          {/* Content Area */}
           <ScrollArea className="flex-1 p-4">
-            {/* Search Results */}
             {searchResults.length > 0 && (
               <div className="mb-6">
                 <h3 className="font-semibold mb-3">Search Results</h3>
                 <div className="space-y-2">
                   {searchResults.map((track) => (
-                    <Card key={track.id} className="hover:bg-accent transition-colors">
+                    <Card
+                      key={track.id}
+                      className="hover:bg-accent transition-colors cursor-pointer"
+                      onContextMenu={(e) => handleContextMenu(e, track, "search")}
+                    >
                       <CardContent className="p-3">
                         <div className="flex items-center gap-3">
                           <img
@@ -256,7 +299,6 @@ export function MusicSidebar() {
               </div>
             )}
 
-            {/* Queue */}
             {queue.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-3">Queue ({queue.length})</h3>
@@ -264,9 +306,10 @@ export function MusicSidebar() {
                   {queue.map((track, index) => (
                     <Card
                       key={track.queueId}
-                      className={`hover:bg-accent transition-colors ${
+                      className={`hover:bg-accent transition-colors cursor-pointer ${
                         currentTrack?.queueId === track.queueId ? "border-primary" : ""
                       }`}
+                      onContextMenu={(e) => handleContextMenu(e, track, "queue")}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-center gap-3">
@@ -311,14 +354,55 @@ export function MusicSidebar() {
           </ScrollArea>
         </div>
 
-        {/* Hidden YouTube Player */}
         <div id="youtube-player" style={{ width: 0, height: 0, overflow: "hidden" }} />
       </div>
+
+      {contextMenu && (
+        <div
+          className="fixed bg-background border border-border rounded-md shadow-lg py-1 z-50 min-w-[160px]"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="w-full px-4 py-2 text-sm text-left hover:bg-accent flex items-center gap-2"
+            onClick={() => {
+              playNow(contextMenu.track)
+              setContextMenu(null)
+            }}
+          >
+            <PlayIcon className="h-4 w-4" />
+            Play Now
+          </button>
+
+          {contextMenu.type === "search" && (
+            <button
+              className="w-full px-4 py-2 text-sm text-left hover:bg-accent flex items-center gap-2"
+              onClick={() => {
+                addToQueue(contextMenu.track as Track)
+                setContextMenu(null)
+              }}
+            >
+              <PlusIcon className="h-4 w-4" />
+              Add to Queue
+            </button>
+          )}
+
+          <button
+            className="w-full px-4 py-2 text-sm text-left hover:bg-accent flex items-center gap-2"
+            onClick={() => {
+              shuffleQueue()
+              setContextMenu(null)
+            }}
+          >
+            <ArrowPathIcon className="h-4 w-4" />
+            Shuffle Queue
+          </button>
+        </div>
+      )}
     </>
   )
 }
 
-// Global type declaration for YouTube API
 declare global {
   interface Window {
     YT: any
