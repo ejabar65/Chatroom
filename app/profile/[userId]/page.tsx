@@ -103,6 +103,12 @@ export default async function ProfilePage({ params }: { params: { userId: string
               </div>
               <p className="text-muted-foreground mb-4">{profileUser.email}</p>
 
+              {profileUser.bio && (
+                <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm leading-relaxed">{profileUser.bio}</p>
+                </div>
+              )}
+
               <div className="flex items-center gap-6 text-sm mb-4">
                 <div>
                   <span className="font-semibold">{profileUser.post_count || 0}</span>
@@ -124,7 +130,35 @@ export default async function ProfilePage({ params }: { params: { userId: string
 
               {userBadges.length > 0 && (
                 <div className="mb-4">
-                  <BadgeDisplay badges={userBadges} size="md" />
+                  <h3 className="text-sm font-semibold mb-2 text-muted-foreground">BADGES</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {userBadges.slice(0, 6).map((badge: any) => (
+                      <div
+                        key={badge.id}
+                        className="group relative flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all hover:scale-105"
+                        style={{
+                          borderColor: badge.badges.color,
+                          backgroundColor: `${badge.badges.color}15`,
+                        }}
+                      >
+                        <span className="text-2xl">{badge.badges.icon}</span>
+                        <span className="text-xs font-semibold">{badge.badges.name}</span>
+                        
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                          <div className="bg-popover text-popover-foreground text-xs rounded-lg p-2 shadow-lg whitespace-nowrap border">
+                            <p className="font-semibold">{badge.badges.name}</p>
+                            <p className="text-muted-foreground">{badge.badges.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {userBadges.length > 6 && (
+                      <div className="flex items-center px-3 py-2 rounded-lg border-2 border-muted bg-muted/20">
+                        <span className="text-xs font-semibold text-muted-foreground">+{userBadges.length - 6} more</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -140,6 +174,11 @@ export default async function ProfilePage({ params }: { params: { userId: string
                       />
                     )}
                   </>
+                )}
+                {isOwnProfile && (
+                  <Link href="/settings">
+                    <Button variant="outline">Edit Profile</Button>
+                  </Link>
                 )}
               </div>
             </div>

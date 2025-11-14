@@ -37,6 +37,47 @@ export async function updateUserPreferences(formData: FormData) {
   return { success: true }
 }
 
+export async function updateUserProfile(formData: FormData) {
+  await applyThrottle()
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: "Not authenticated" }
+  }
+
+  const bio = formData.get("bio") as string
+  const fullName = formData.get("fullName") as string
+
+  // Validate bio length
+  if (bio && bio.length > 500) {
+    return { success: false, error: "Bio must be 500 characters or less" }
+  }
+
+  // Update user profile
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({
+      bio: bio || null,
+      full_name: fullName || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", user.id)
+
+  if (updateError) {
+    console.error("[v0] Error updating profile:", updateError)
+    return { success: false, error: updateError.message }
+  }
+
+  revalidatePath("/")
+  revalidatePath("/settings")
+  revalidatePath(`/profile/${user.id}`)
+  return { success: true }
+}
+
 export async function getUserPreferences(userId: string) {
   await applyThrottle()
 
