@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser } from "@/lib/actions/auth"
 import { Header } from "@/components/header"
 import { PostDetail } from "@/components/post-detail"
-import { notFound, redirect } from "next/navigation"
+import { notFound, redirect } from 'next/navigation'
 
 interface PostPageProps {
   params: Promise<{ id: string }>
@@ -27,7 +27,8 @@ export default async function PostPage({ params }: PostPageProps) {
         id,
         full_name,
         avatar_url,
-        email
+        original_name,
+        is_admin
       ),
       comments (
         *,
@@ -35,7 +36,8 @@ export default async function PostPage({ params }: PostPageProps) {
           id,
           full_name,
           avatar_url,
-          email
+          original_name,
+          is_admin
         )
       )
     `)

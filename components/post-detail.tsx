@@ -26,6 +26,7 @@ interface Comment {
     avatar_url: string | null
     email: string
     is_admin: boolean
+    original_name: string | null
   }
 }
 
@@ -43,6 +44,7 @@ interface Post {
     avatar_url: string | null
     email: string
     is_admin: boolean
+    original_name: string | null
   }
   comments: Comment[]
 }
@@ -73,8 +75,7 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
       .toUpperCase() || post.users.email[0].toUpperCase()
 
   const postAuthorDisplayName = post.users.full_name || "Student"
-  const postAuthorHasCustomName = post.users.full_name && post.users.full_name !== post.users.email
-  // </CHANGE>
+  const postAuthorHasCustomName = post.users.full_name && post.users.original_name && post.users.full_name !== post.users.original_name
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -153,17 +154,15 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                   )}
                 </div>
               </Link>
-              {/* </CHANGE> */}
               <div>
                 <p className={`font-medium ${isAdmin(post.users) ? "text-yellow-600 dark:text-yellow-400" : ""}`}>
                   {postAuthorDisplayName}
                   {postAuthorHasCustomName && (
                     <span className="text-xs text-muted-foreground font-normal ml-1">
-                      ({post.users.email})
+                      ({post.users.original_name})
                     </span>
                   )}
                 </p>
-                {/* </CHANGE> */}
                 <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                 </p>
@@ -238,8 +237,7 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                       .toUpperCase() || comment.users.email[0].toUpperCase()
 
                   const commentAuthorDisplayName = comment.users.full_name || "Student"
-                  const commentAuthorHasCustomName = comment.users.full_name && comment.users.full_name !== comment.users.email
-                  // </CHANGE>
+                  const commentAuthorHasCustomName = comment.users.full_name && comment.users.original_name && comment.users.full_name !== comment.users.original_name
 
                   return (
                     <div key={comment.id} className="flex gap-3 p-4 rounded-lg bg-muted/50">
@@ -264,11 +262,10 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                             {commentAuthorDisplayName}
                             {commentAuthorHasCustomName && (
                               <span className="text-xs text-muted-foreground font-normal ml-1">
-                                ({comment.users.email})
+                                ({comment.users.original_name})
                               </span>
                             )}
                           </p>
-                          {/* </CHANGE> */}
                           <p className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                           </p>

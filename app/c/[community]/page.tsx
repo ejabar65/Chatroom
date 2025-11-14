@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser } from "@/lib/actions/auth"
 import { Header } from "@/components/header"
 import { CommunityFeed } from "@/components/community-feed"
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation'
 
 export default async function CommunityPage({
   params,
@@ -40,7 +40,7 @@ export default async function CommunityPage({
         id,
         full_name,
         avatar_url,
-        email
+        original_name
       ),
       comments (count)
     `)
