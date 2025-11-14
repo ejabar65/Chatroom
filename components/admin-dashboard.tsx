@@ -3,7 +3,7 @@
 import { CardFooter } from "@/components/ui/card"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -23,7 +23,17 @@ import {
 import { formatDistanceToNow } from "date-fns"
 import { flagPost, unflagPost, deletePost } from "@/lib/actions/posts"
 import { flagComment, unflagComment, deleteComment } from "@/lib/actions/comments"
+import { banUser, unbanUser, toggleUserAdmin, toggleUserThrottle } from "@/lib/actions/admin"
 import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 
 interface Post {
   id: string
@@ -60,21 +70,39 @@ interface Comment {
   }
 }
 
+interface User {
+  id: string
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  is_admin: boolean
+  is_banned: boolean
+  is_throttled: boolean
+  ban_reason: string | null
+  banned_at: string | null
+  created_at: string
+}
+
 interface AdminDashboardProps {
   posts: Post[]
   comments: Comment[]
+  users: User[]
   stats: {
     totalPosts: number
     flaggedPosts: number
     totalComments: number
     flaggedComments: number
     totalUsers: number
+    bannedUsers: number
   }
 }
 
-export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) {
+export function AdminDashboard({ posts, comments, users, stats }: AdminDashboardProps) {
   const router = useRouter()
   const [flagReason, setFlagReason] = useState<{ [key: string]: string }>({})
+  const [banDialogOpen, setBanDialogOpen] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [banReasonInput, setBanReasonInput] = useState("")
 
   const getAdminKey = () => {
     if (typeof window !== "undefined") {
@@ -146,6 +174,51 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
     }
   }
 
+  const handleBanUser = async () => {
+    if (!selectedUserId) return
+    const adminKey = getAdminKey()
+    const result = await banUser(selectedUserId, banReasonInput, adminKey)
+    if (result.success) {
+      setBanDialogOpen(false)
+      setBanReasonInput("")
+      setSelectedUserId(null)
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
+  const handleUnbanUser = async (userId: string) => {
+    const adminKey = getAdminKey()
+    const result = await unbanUser(userId, adminKey)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
+  const handleToggleAdmin = async (userId: string) => {
+    if (!confirm("Are you sure you want to toggle admin status for this user?")) return
+    const adminKey = getAdminKey()
+    const result = await toggleUserAdmin(userId, adminKey)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
+  const handleToggleThrottle = async (userId: string) => {
+    const adminKey = getAdminKey()
+    const result = await toggleUserThrottle(userId, adminKey)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -159,7 +232,7 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
@@ -168,6 +241,18 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
             <div className="flex items-center gap-2">
               <UsersIcon className="w-5 h-5 text-indigo-600" />
               <span className="text-2xl font-bold">{stats.totalUsers}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Banned Users</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <AlertIcon className="w-5 h-5 text-red-600" />
+              <span className="text-2xl font-bold">{stats.bannedUsers}</span>
             </div>
           </CardContent>
         </Card>
@@ -222,12 +307,104 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
       </div>
 
       {/* Content Management Tabs */}
-      <Tabs defaultValue="posts" className="space-y-4">
+      <Tabs defaultValue="users" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="users">Users ({users.length})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({posts.length})</TabsTrigger>
           <TabsTrigger value="comments">Comments ({comments.length})</TabsTrigger>
           <TabsTrigger value="flagged">Flagged Content ({stats.flaggedPosts + stats.flaggedComments})</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="users" className="space-y-4">
+          {users.map((user) => {
+            const initials =
+              user.full_name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase() || user.email[0].toUpperCase()
+
+            return (
+              <Card key={user.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={user.avatar_url || undefined} />
+                        <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-sm">{user.full_name || "Student"}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Joined {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {user.is_admin && <Badge variant="secondary">Admin</Badge>}
+                      {user.is_throttled && <Badge variant="outline">Throttled</Badge>}
+                      {user.is_banned && (
+                        <Badge variant="destructive">
+                          <AlertIcon className="w-3 h-3 mr-1" />
+                          Banned
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                {user.is_banned && user.ban_reason && (
+                  <CardContent>
+                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                      <p className="text-sm font-medium text-destructive">Ban Reason:</p>
+                      <p className="text-sm text-destructive/80">{user.ban_reason}</p>
+                      {user.banned_at && (
+                        <p className="text-xs text-destructive/60 mt-1">
+                          Banned {formatDistanceToNow(new Date(user.banned_at), { addSuffix: true })}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                )}
+                <CardFooter className="flex gap-2 flex-wrap">
+                  <Button
+                    variant={user.is_admin ? "destructive" : "outline"}
+                    size="sm"
+                    onClick={() => handleToggleAdmin(user.id)}
+                  >
+                    <ShieldIcon className="w-4 h-4 mr-2" />
+                    {user.is_admin ? "Remove Admin" : "Make Admin"}
+                  </Button>
+                  <Button
+                    variant={user.is_throttled ? "outline" : "secondary"}
+                    size="sm"
+                    onClick={() => handleToggleThrottle(user.id)}
+                  >
+                    {user.is_throttled ? "Unthrottle" : "Throttle"}
+                  </Button>
+                  {!user.is_banned ? (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedUserId(user.id)
+                        setBanDialogOpen(true)
+                      }}
+                    >
+                      <FlagIcon className="w-4 h-4 mr-2" />
+                      Ban User
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={() => handleUnbanUser(user.id)}>
+                      <CheckIcon className="w-4 h-4 mr-2" />
+                      Unban User
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            )
+          })}
+        </TabsContent>
 
         <TabsContent value="posts" className="space-y-4">
           {posts.map((post) => {
@@ -528,6 +705,35 @@ export function AdminDashboard({ posts, comments, stats }: AdminDashboardProps) 
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Ban User Dialog */}
+      <Dialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ban User</DialogTitle>
+            <DialogDescription>Provide a reason for banning this user. They will be unable to access the platform.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="ban-reason">Ban Reason</Label>
+              <Input
+                id="ban-reason"
+                placeholder="Enter reason for ban..."
+                value={banReasonInput}
+                onChange={(e) => setBanReasonInput(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBanDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleBanUser} disabled={!banReasonInput.trim()}>
+              Ban User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
