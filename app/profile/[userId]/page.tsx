@@ -13,7 +13,8 @@ import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import { CrownIcon, MessageCircleIcon } from "@/components/icons"
 
-export default async function ProfilePage({ params }: { params: { userId: string } }) {
+export default async function ProfilePage({ params }: { params: Promise<{ userId: string }> }) {
+  const { userId } = await params
   const supabase = await createClient()
 
   const {
@@ -35,7 +36,7 @@ export default async function ProfilePage({ params }: { params: { userId: string
   const { data: profileUser, error: userError } = await supabase
     .from("users")
     .select("*")
-    .eq("id", params.userId)
+    .eq("id", userId)
     .single()
 
   if (userError || !profileUser) {
@@ -52,13 +53,13 @@ export default async function ProfilePage({ params }: { params: { userId: string
       comments:comments(count)
     `
     )
-    .eq("user_id", params.userId)
+    .eq("user_id", userId)
     .eq("is_flagged", false)
     .order("created_at", { ascending: false })
     .limit(20)
 
   // Fetch user's badges
-  const badgesResult = await getUserBadges(params.userId)
+  const badgesResult = await getUserBadges(userId)
   const userBadges = badgesResult.data || []
 
   const initials =
@@ -68,7 +69,7 @@ export default async function ProfilePage({ params }: { params: { userId: string
       .join("")
       .toUpperCase() || profileUser.email[0].toUpperCase()
 
-  const isOwnProfile = currentUser.id === params.userId
+  const isOwnProfile = currentUser.id === userId
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -165,10 +166,10 @@ export default async function ProfilePage({ params }: { params: { userId: string
               <div className="flex gap-3">
                 {!isOwnProfile && (
                   <>
-                    <FollowButton userId={params.userId} />
+                    <FollowButton userId={userId} />
                     {(currentUserData?.is_admin || true) && (
                       <AwardBadgeDialog
-                        userId={params.userId}
+                        userId={userId}
                         userName={profileUser.full_name || "Student"}
                         currentUserIsAdmin={currentUserData?.is_admin || false}
                       />
