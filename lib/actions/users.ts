@@ -17,7 +17,7 @@ export async function getAllUsers() {
   const { data: profile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
   if (!profile?.is_admin) {
-    return { success: false, error: "Unauthorized" }
+    return { success: false, error: "Not authorized" }
   }
 
   // Fetch all users
@@ -43,14 +43,13 @@ export async function banUser(userId: string, reason: string, adminKey: string) 
     return { success: false, error: "Not authenticated" }
   }
 
-  // Check if user is admin
+  // Check if user is admin or has admin key
   const { data: profile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
-  const validAdminKey = process.env.ADMIN_SECRET_KEY || "admin123"
-  const isAuthorized = profile?.is_admin || adminKey === validAdminKey
+  const isAuthorized = profile?.is_admin || adminKey === process.env.ADMIN_SECRET_KEY
 
   if (!isAuthorized) {
-    return { success: false, error: "Unauthorized" }
+    return { success: false, error: "Not authorized" }
   }
 
   // Ban the user
@@ -58,9 +57,9 @@ export async function banUser(userId: string, reason: string, adminKey: string) 
     .from("users")
     .update({
       is_banned: true,
+      banned_by: user.id,
       ban_reason: reason,
       banned_at: new Date().toISOString(),
-      banned_by: user.id,
     })
     .eq("id", userId)
 
@@ -82,14 +81,13 @@ export async function unbanUser(userId: string, adminKey: string) {
     return { success: false, error: "Not authenticated" }
   }
 
-  // Check if user is admin
+  // Check if user is admin or has admin key
   const { data: profile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
-  const validAdminKey = process.env.ADMIN_SECRET_KEY || "admin123"
-  const isAuthorized = profile?.is_admin || adminKey === validAdminKey
+  const isAuthorized = profile?.is_admin || adminKey === process.env.ADMIN_SECRET_KEY
 
   if (!isAuthorized) {
-    return { success: false, error: "Unauthorized" }
+    return { success: false, error: "Not authorized" }
   }
 
   // Unban the user
@@ -97,9 +95,9 @@ export async function unbanUser(userId: string, adminKey: string) {
     .from("users")
     .update({
       is_banned: false,
+      banned_by: null,
       ban_reason: null,
       banned_at: null,
-      banned_by: null,
     })
     .eq("id", userId)
 
@@ -111,7 +109,7 @@ export async function unbanUser(userId: string, adminKey: string) {
   return { success: true }
 }
 
-export async function toggleUserAdmin(userId: string, adminKey: string) {
+export async function toggleAdminStatus(userId: string, adminKey: string) {
   const supabase = await createClient()
 
   const {
@@ -121,17 +119,16 @@ export async function toggleUserAdmin(userId: string, adminKey: string) {
     return { success: false, error: "Not authenticated" }
   }
 
-  // Check if user is admin
+  // Check if user is admin or has admin key
   const { data: profile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
-  const validAdminKey = process.env.ADMIN_SECRET_KEY || "admin123"
-  const isAuthorized = profile?.is_admin || adminKey === validAdminKey
+  const isAuthorized = profile?.is_admin || adminKey === process.env.ADMIN_SECRET_KEY
 
   if (!isAuthorized) {
-    return { success: false, error: "Unauthorized" }
+    return { success: false, error: "Not authorized" }
   }
 
-  // Get current admin status
+  // Get target user's current admin status
   const { data: targetUser } = await supabase.from("users").select("is_admin").eq("id", userId).single()
 
   // Toggle admin status
@@ -150,7 +147,7 @@ export async function toggleUserAdmin(userId: string, adminKey: string) {
   return { success: true }
 }
 
-export async function toggleUserThrottle(userId: string, adminKey: string) {
+export async function toggleThrottleStatus(userId: string, adminKey: string) {
   const supabase = await createClient()
 
   const {
@@ -160,17 +157,16 @@ export async function toggleUserThrottle(userId: string, adminKey: string) {
     return { success: false, error: "Not authenticated" }
   }
 
-  // Check if user is admin
+  // Check if user is admin or has admin key
   const { data: profile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
 
-  const validAdminKey = process.env.ADMIN_SECRET_KEY || "admin123"
-  const isAuthorized = profile?.is_admin || adminKey === validAdminKey
+  const isAuthorized = profile?.is_admin || adminKey === process.env.ADMIN_SECRET_KEY
 
   if (!isAuthorized) {
-    return { success: false, error: "Unauthorized" }
+    return { success: false, error: "Not authorized" }
   }
 
-  // Get current throttle status
+  // Get target user's current throttle status
   const { data: targetUser } = await supabase.from("users").select("is_throttled").eq("id", userId).single()
 
   // Toggle throttle status

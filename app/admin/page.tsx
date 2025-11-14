@@ -46,10 +46,7 @@ export default async function AdminPage() {
     `)
     .order("created_at", { ascending: false })
 
-  const { data: allUsers } = await supabase
-    .from("users")
-    .select("*")
-    .order("created_at", { ascending: false })
+  const { data: allUsers } = await supabase.from("users").select("*").order("created_at", { ascending: false })
 
   // Get statistics
   const { count: totalPosts } = await supabase.from("homework_posts").select("*", { count: "exact", head: true })
@@ -68,11 +65,6 @@ export default async function AdminPage() {
 
   const { count: totalUsers } = await supabase.from("users").select("*", { count: "exact", head: true })
 
-  const { count: bannedUsers } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .eq("is_banned", true)
-
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
@@ -87,7 +79,6 @@ export default async function AdminPage() {
             totalComments: totalComments || 0,
             flaggedComments: flaggedComments || 0,
             totalUsers: totalUsers || 0,
-            bannedUsers: bannedUsers || 0,
           }}
         />
       </main>

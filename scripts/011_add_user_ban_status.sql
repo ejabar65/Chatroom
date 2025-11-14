@@ -1,8 +1,0 @@
--- Add banned status to users table
-ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT FALSE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS ban_reason TEXT;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_at TIMESTAMP WITH TIME ZONE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_by UUID REFERENCES users(id);
-
--- Create index for banned users
-CREATE INDEX IF NOT EXISTS idx_users_is_banned ON users(is_banned);
