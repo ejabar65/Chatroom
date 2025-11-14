@@ -24,9 +24,14 @@ export async function createPost(formData: FormData) {
     const title = formData.get("title") as string
     const description = formData.get("description") as string
     const subject = formData.get("subject") as string
+    const communityId = formData.get("communityId") as string
 
     if (!image || !title) {
       return { success: false, error: "Missing required fields" }
+    }
+
+    if (!communityId) {
+      return { success: false, error: "Please select a board for your post" }
     }
 
     const titleCheck = strictContentFilter(title)
@@ -53,7 +58,6 @@ export async function createPost(formData: FormData) {
       return { success: false, error: imageCheck.reason || "Image failed content moderation" }
     }
 
-    // Upload image to Supabase Storage
     const fileExt = image.name.split(".").pop()
     const fileName = `${user.id}-${Date.now()}.${fileExt}`
     const filePath = `homework-images/${fileName}`
@@ -68,14 +72,13 @@ export async function createPost(formData: FormData) {
       return { success: false, error: "Failed to upload image" }
     }
 
-    // Get public URL
     const {
       data: { publicUrl },
     } = supabase.storage.from("homework").getPublicUrl(filePath)
 
-    // Create post in database
     const { error: insertError } = await supabase.from("homework_posts").insert({
       user_id: user.id,
+      community_id: communityId,
       title: title.trim(),
       description: description.trim() || null,
       subject: subject || null,
@@ -84,12 +87,12 @@ export async function createPost(formData: FormData) {
 
     if (insertError) {
       console.error("[v0] Insert error:", insertError)
-      // Clean up uploaded image
       await supabase.storage.from("homework").remove([filePath])
       return { success: false, error: "Failed to create post" }
     }
 
     revalidatePath("/")
+    revalidatePath(`/c/${communityId}`)
     return { success: true }
   } catch (error) {
     console.error("[v0] Unexpected error:", error)
@@ -110,10 +113,9 @@ export async function deletePost(postId: string, adminKey?: string) {
       return { success: false, error: "Not authenticated" }
     }
 
-    // Get post to check ownership and get image URL
     const { data: post, error: fetchError } = await supabase
       .from("homework_posts")
-      .select("user_id, image_url")
+      .select("user_id, image_url, community_id")
       .eq("id", postId)
       .single()
 
@@ -131,14 +133,12 @@ export async function deletePost(postId: string, adminKey?: string) {
       return { success: false, error: "Not authorized" }
     }
 
-    // Delete post
     const { error: deleteError } = await supabase.from("homework_posts").delete().eq("id", postId)
 
     if (deleteError) {
       return { success: false, error: "Failed to delete post" }
     }
 
-    // Delete image from storage
     if (post.image_url) {
       const path = post.image_url.split("/homework/")[1]
       if (path) {
@@ -147,6 +147,7 @@ export async function deletePost(postId: string, adminKey?: string) {
     }
 
     revalidatePath("/")
+    revalidatePath(`/c/${post.community_id}`)
     return { success: true }
   } catch (error) {
     console.error("[v0] Delete error:", error)

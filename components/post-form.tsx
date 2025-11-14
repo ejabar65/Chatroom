@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Upload, X, Loader2, Plus } from "lucide-react"
+import { Upload, X, Loader2, Plus } from 'lucide-react'
 import { createPost } from "@/lib/actions/posts"
 import { getCommunities, createCommunity } from "@/lib/actions/communities"
 
@@ -155,6 +155,11 @@ export function PostForm({ userId }: PostFormProps) {
       return
     }
 
+    if (!formData.communityId) {
+      alert("Please select a board for your post")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -164,9 +169,7 @@ export function PostForm({ userId }: PostFormProps) {
       formDataToSend.append("description", formData.description)
       formDataToSend.append("subject", formData.subject)
       formDataToSend.append("userId", userId)
-      if (formData.communityId) {
-        formDataToSend.append("communityId", formData.communityId)
-      }
+      formDataToSend.append("communityId", formData.communityId)
 
       const result = await createPost(formDataToSend)
 
@@ -243,11 +246,12 @@ export function PostForm({ userId }: PostFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="board">Board (Optional)</Label>
+              <Label htmlFor="board">Board *</Label>
               <div className="flex gap-2">
                 <Select
                   value={formData.communityId}
                   onValueChange={(value) => setFormData({ ...formData, communityId: value })}
+                  required
                 >
                   <SelectTrigger id="board" className="flex-1">
                     <SelectValue placeholder="Select a board" />
@@ -270,6 +274,7 @@ export function PostForm({ userId }: PostFormProps) {
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground">Posts must be assigned to a board</p>
             </div>
 
             <div className="space-y-2">
@@ -313,7 +318,7 @@ export function PostForm({ userId }: PostFormProps) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !imageFile}
+              disabled={isSubmitting || !imageFile || !formData.communityId}
               className="flex-1 bg-indigo-600 hover:bg-indigo-700"
             >
               {isSubmitting ? (
