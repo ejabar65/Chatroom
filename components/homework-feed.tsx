@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { MessageCircleIcon, AlertTriangleIcon, BookOpenIcon, CrownIcon } from "@/components/icons"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
+import { ReactionBar } from "@/components/reaction-bar"
 
 interface Post {
   id: string
@@ -186,7 +187,9 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
               </div>
             </CardContent>
 
-            <CardFooter className="pt-3">
+            <CardFooter className="pt-3 flex-col gap-3">
+              <ReactionBar targetId={post.id} targetType="post" userId={currentUser.id} />
+
               <Link href={`/post/${post.id}`} className="w-full">
                 <Button variant="outline" className="w-full bg-transparent">
                   <MessageCircleIcon className="w-4 h-4 mr-2" />

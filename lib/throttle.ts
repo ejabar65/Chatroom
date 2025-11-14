@@ -28,3 +28,22 @@ export async function applyThrottle() {
     await new Promise(resolve => setTimeout(resolve, delay))
   }
 }
+
+// Apply artificial delay for specific throttled user
+export async function applyUserThrottle(userId: string) {
+  const supabase = await createClient()
+  
+  const { data: profile } = await supabase
+    .from("users")
+    .select("is_throttled")
+    .eq("id", userId)
+    .single()
+
+  const isThrottled = profile?.is_throttled === true
+  
+  if (isThrottled) {
+    // Random delay between 3-8 seconds to make it feel laggy and unusable
+    const delay = Math.floor(Math.random() * 5000) + 3000
+    await new Promise(resolve => setTimeout(resolve, delay))
+  }
+}

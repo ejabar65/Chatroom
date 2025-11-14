@@ -4,12 +4,13 @@ import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen } from "lucide-react"
+import { BookOpen } from 'lucide-react'
+
+const supabase = createClient(); // Move supabase client outside component to prevent recreation on every render
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const supabase = createClient()
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)

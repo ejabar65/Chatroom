@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -14,6 +13,7 @@ import { formatDistanceToNow } from "date-fns"
 import { createComment } from "@/lib/actions/comments"
 import { deletePost } from "@/lib/actions/posts"
 import Link from "next/link"
+import { ReactionBar } from "@/components/reaction-bar"
 
 interface Comment {
   id: string
@@ -174,6 +174,10 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
           <div className="relative w-full overflow-hidden rounded-lg border border-border bg-muted">
             <img src={post.image_url || "/placeholder.svg"} alt={post.title} className="w-full h-auto" />
           </div>
+          
+          <div className="pt-2">
+            <ReactionBar targetId={post.id} targetType="post" userId={currentUser.id} />
+          </div>
         </CardContent>
       </Card>
 
@@ -250,6 +254,10 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                           )}
                         </div>
                         <p className="text-sm text-pretty">{comment.content}</p>
+                        
+                        <div className="pt-2">
+                          <ReactionBar targetId={comment.id} targetType="comment" userId={currentUser.id} />
+                        </div>
                       </div>
                     </div>
                   )
