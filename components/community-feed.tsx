@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { MessageCircle, AlertTriangle } from "lucide-react"
+import { MessageCircle, AlertTriangle } from 'lucide-react'
 import { CrownIcon } from "@/components/icons"
 import Link from "next/link"
 import { joinCommunity, leaveCommunity } from "@/lib/actions/communities"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { formatDistanceToNow } from "date-fns"
 
 function getRoleBadge(role: string | null | undefined) {
@@ -117,17 +117,20 @@ function CardLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
         <Link key={post.id} href={`/post/${post.id}`}>
           <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex gap-4">
-              <div className="relative">
-                <Avatar>
-                  <AvatarImage src={post.users.avatar_url || "/placeholder.svg"} />
-                  <AvatarFallback>{post.users.full_name?.[0] || post.users.email[0]}</AvatarFallback>
-                </Avatar>
-                {isAdmin(post.users.memberRole) && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
-                    <CrownIcon className="w-3 h-3 text-white" />
-                  </div>
-                )}
-              </div>
+              <Link href={`/profile/${post.users.id}`} onClick={(e) => e.stopPropagation()}>
+                <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
+                  <Avatar>
+                    <AvatarImage src={post.users.avatar_url || "/placeholder.svg"} />
+                    <AvatarFallback>{post.users.full_name?.[0] || post.users.email[0]}</AvatarFallback>
+                  </Avatar>
+                  {isAdmin(post.users.memberRole) && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                      <CrownIcon className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </div>
+              </Link>
+              {/* </CHANGE> */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span
@@ -180,17 +183,20 @@ function ListLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
           <Link key={post.id} href={`/post/${post.id}`}>
             <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={post.users.avatar_url || undefined} />
-                    <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                  </Avatar>
-                  {isAdmin(post.users.memberRole) && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
-                      <CrownIcon className="w-2.5 h-2.5 text-white" />
-                    </div>
-                  )}
-                </div>
+                <Link href={`/profile/${post.users.id}`} onClick={(e) => e.stopPropagation()}>
+                  <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={post.users.avatar_url || undefined} />
+                      <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                    </Avatar>
+                    {isAdmin(post.users.memberRole) && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                        <CrownIcon className="w-2.5 h-2.5 text-white" />
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                {/* </CHANGE> */}
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">

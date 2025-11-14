@@ -306,10 +306,12 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={post.users.avatar_url || undefined} />
-                        <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                      </Avatar>
+                      <Link href={`/profile/${post.users.id}`}>
+                        <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+                          <AvatarImage src={post.users.avatar_url || undefined} />
+                          <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                        </Avatar>
+                      </Link>
                       <div>
                         <p className="font-medium text-sm">{post.users.full_name || "Student"}</p>
                         <p className="text-xs text-muted-foreground">{post.users.email}</p>
@@ -396,10 +398,12 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={comment.users.avatar_url || undefined} />
-                        <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                      </Avatar>
+                      <Link href={`/profile/${comment.users.id}`}>
+                        <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+                          <AvatarImage src={comment.users.avatar_url || undefined} />
+                          <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                        </Avatar>
+                      </Link>
                       <div>
                         <p className="font-medium text-sm">{comment.users.full_name || "Student"}</p>
                         <p className="text-xs text-muted-foreground">{comment.users.email}</p>
@@ -476,10 +480,12 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                           <CardHeader>
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex items-center gap-3">
-                                <Avatar>
-                                  <AvatarImage src={post.users.avatar_url || undefined} />
-                                  <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                                </Avatar>
+                                <Link href={`/profile/${post.users.id}`}>
+                                  <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+                                    <AvatarImage src={post.users.avatar_url || undefined} />
+                                    <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                                  </Avatar>
+                                </Link>
                                 <div>
                                   <p className="font-medium text-sm">{post.users.full_name || "Student"}</p>
                                   <p className="text-xs text-muted-foreground">{post.users.email}</p>
@@ -541,10 +547,12 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                           <CardHeader>
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex items-center gap-3">
-                                <Avatar>
-                                  <AvatarImage src={comment.users.avatar_url || undefined} />
-                                  <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                                </Avatar>
+                                <Link href={`/profile/${comment.users.id}`}>
+                                  <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+                                    <AvatarImage src={comment.users.avatar_url || undefined} />
+                                    <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                                  </Avatar>
+                                </Link>
                                 <div>
                                   <p className="font-medium text-sm">{comment.users.full_name || "Student"}</p>
                                   <p className="text-xs text-muted-foreground">{comment.users.email}</p>
@@ -605,10 +613,12 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={user.avatar_url || undefined} />
-                        <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                      </Avatar>
+                      <Link href={`/profile/${user.id}`}>
+                        <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+                          <AvatarImage src={user.avatar_url || undefined} />
+                          <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                        </Avatar>
+                      </Link>
                       <div>
                         <p className="font-medium text-sm">{user.full_name || "Student"}</p>
                         <p className="text-xs text-muted-foreground">{user.email}</p>

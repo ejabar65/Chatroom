@@ -136,17 +136,20 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={post.users.avatar_url || undefined} />
-                  <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
-                </Avatar>
-                {isAdmin(post.users) && (
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
-                    <CrownIcon className="w-3.5 h-3.5 text-white" />
-                  </div>
-                )}
-              </div>
+              <Link href={`/profile/${post.users.id}`}>
+                <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={post.users.avatar_url || undefined} />
+                    <AvatarFallback className="bg-indigo-100 text-indigo-700">{initials}</AvatarFallback>
+                  </Avatar>
+                  {isAdmin(post.users) && (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                      <CrownIcon className="w-3.5 h-3.5 text-white" />
+                    </div>
+                  )}
+                </div>
+              </Link>
+              {/* </CHANGE> */}
               <div>
                 <p className={`font-medium ${isAdmin(post.users) ? "text-yellow-600 dark:text-yellow-400" : ""}`}>
                   {post.users.full_name || "Student"}
@@ -226,17 +229,20 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
 
                   return (
                     <div key={comment.id} className="flex gap-3 p-4 rounded-lg bg-muted/50">
-                      <div className="relative">
-                        <Avatar>
-                          <AvatarImage src={comment.users.avatar_url || undefined} />
-                          <AvatarFallback className="bg-indigo-100 text-indigo-700">{commentInitials}</AvatarFallback>
-                        </Avatar>
-                        {isAdmin(comment.users) && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
-                            <CrownIcon className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </div>
+                      <Link href={`/profile/${comment.users.id}`}>
+                        <div className="relative cursor-pointer hover:opacity-80 transition-opacity">
+                          <Avatar>
+                            <AvatarImage src={comment.users.avatar_url || undefined} />
+                            <AvatarFallback className="bg-indigo-100 text-indigo-700">{commentInitials}</AvatarFallback>
+                          </Avatar>
+                          {isAdmin(comment.users) && (
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background">
+                              <CrownIcon className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                      {/* </CHANGE> */}
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                           <p
