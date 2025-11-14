@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { containsProfanity, checkImageContent } from "@/lib/content-filter"
+import { strictContentFilter, checkImageContent } from "@/lib/content-filter"
 
 const ADMIN_KEY = "$#GS29gs1"
 
@@ -10,7 +10,6 @@ export async function createPost(formData: FormData) {
   try {
     const supabase = await createClient()
 
-    // Get current user
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -18,7 +17,6 @@ export async function createPost(formData: FormData) {
       return { success: false, error: "Not authenticated" }
     }
 
-    // Get form data
     const image = formData.get("image") as File
     const title = formData.get("title") as string
     const description = formData.get("description") as string
@@ -28,12 +26,23 @@ export async function createPost(formData: FormData) {
       return { success: false, error: "Missing required fields" }
     }
 
-    if (containsProfanity(title)) {
-      return { success: false, error: "Title contains inappropriate language" }
+    const titleCheck = strictContentFilter(title)
+    if (!titleCheck.safe) {
+      return { success: false, error: `Title: ${titleCheck.reason}` }
     }
 
-    if (description && containsProfanity(description)) {
-      return { success: false, error: "Description contains inappropriate language" }
+    if (description && description.trim()) {
+      const descriptionCheck = strictContentFilter(description)
+      if (!descriptionCheck.safe) {
+        return { success: false, error: `Description: ${descriptionCheck.reason}` }
+      }
+    }
+
+    if (subject && subject.trim()) {
+      const subjectCheck = strictContentFilter(subject)
+      if (!subjectCheck.safe) {
+        return { success: false, error: `Subject: ${subjectCheck.reason}` }
+      }
     }
 
     const imageCheck = await checkImageContent(image)

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { strictContentFilter } from "@/lib/content-filter"
 
 export async function getCommunities() {
   const supabase = await createClient()
@@ -57,8 +58,33 @@ export async function createCommunity(formData: FormData) {
   const displayName = formData.get("displayName") as string
   const description = formData.get("description") as string
 
+  if (!name || !name.trim()) {
+    return { success: false, error: "Board name is required" }
+  }
+
+  const nameCheck = strictContentFilter(name)
+  if (!nameCheck.safe) {
+    return { success: false, error: `Board name: ${nameCheck.reason}` }
+  }
+
+  const displayNameCheck = strictContentFilter(displayName)
+  if (!displayNameCheck.safe) {
+    return { success: false, error: `Display name: ${displayNameCheck.reason}` }
+  }
+
+  if (description && description.trim()) {
+    const descriptionCheck = strictContentFilter(description)
+    if (!descriptionCheck.safe) {
+      return { success: false, error: `Description: ${descriptionCheck.reason}` }
+    }
+  }
+
   // Create URL-friendly name
   const urlName = name.toLowerCase().replace(/[^a-z0-9]/g, "")
+
+  if (urlName.length < 3) {
+    return { success: false, error: "Board name must be at least 3 characters" }
+  }
 
   const { data, error } = await supabase
     .from("communities")

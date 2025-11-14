@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
-import { containsProfanity } from "@/lib/content-filter"
+import { strictContentFilter } from "@/lib/content-filter"
 
 const ADMIN_KEY = "$#GS29gs1"
 
@@ -21,8 +21,9 @@ export async function createComment(postId: string, content: string) {
       return { success: false, error: "Comment cannot be empty" }
     }
 
-    if (containsProfanity(content)) {
-      return { success: false, error: "Comment contains inappropriate language" }
+    const contentCheck = strictContentFilter(content)
+    if (!contentCheck.safe) {
+      return { success: false, error: contentCheck.reason }
     }
 
     const { error } = await supabase.from("comments").insert({
