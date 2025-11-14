@@ -3,8 +3,11 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { strictContentFilter } from "@/lib/content-filter"
+import { applyThrottle } from "@/lib/throttle"
 
 export async function getCommunities() {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const { data, error } = await supabase.from("communities").select("*").order("member_count", { ascending: false })
@@ -18,6 +21,8 @@ export async function getCommunities() {
 }
 
 export async function getCommunity(nameOrId: string) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -45,6 +50,8 @@ export async function getCommunity(nameOrId: string) {
 }
 
 export async function createCommunity(formData: FormData) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const {
@@ -113,6 +120,8 @@ export async function createCommunity(formData: FormData) {
 }
 
 export async function joinCommunity(communityId: string) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const {
@@ -136,6 +145,8 @@ export async function joinCommunity(communityId: string) {
 }
 
 export async function leaveCommunity(communityId: string) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const {
@@ -159,6 +170,8 @@ export async function leaveCommunity(communityId: string) {
 }
 
 export async function getUserCommunities(userId: string) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const { data, error } = await supabase

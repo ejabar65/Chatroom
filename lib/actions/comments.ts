@@ -3,10 +3,13 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { strictContentFilter } from "@/lib/content-filter"
+import { applyThrottle } from "@/lib/throttle"
 
 const ADMIN_KEY = "$#GS29gs1"
 
 export async function createComment(postId: string, content: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 
@@ -46,6 +49,8 @@ export async function createComment(postId: string, content: string) {
 }
 
 export async function flagComment(commentId: string, adminKey: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 
@@ -80,6 +85,8 @@ export async function flagComment(commentId: string, adminKey: string) {
 }
 
 export async function unflagComment(commentId: string, adminKey: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 
@@ -114,6 +121,8 @@ export async function unflagComment(commentId: string, adminKey: string) {
 }
 
 export async function deleteComment(commentId: string, adminKey?: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 

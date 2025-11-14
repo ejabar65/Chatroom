@@ -3,10 +3,13 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { strictContentFilter, checkImageContent } from "@/lib/content-filter"
+import { applyThrottle } from "@/lib/throttle"
 
 const ADMIN_KEY = "$#GS29gs1"
 
 export async function createPost(formData: FormData) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 
@@ -95,6 +98,8 @@ export async function createPost(formData: FormData) {
 }
 
 export async function deletePost(postId: string, adminKey?: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 
@@ -150,6 +155,8 @@ export async function deletePost(postId: string, adminKey?: string) {
 }
 
 export async function flagPost(postId: string, reason: string, adminKey: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 
@@ -188,6 +195,8 @@ export async function flagPost(postId: string, reason: string, adminKey: string)
 }
 
 export async function unflagPost(postId: string, adminKey: string) {
+  await applyThrottle()
+
   try {
     const supabase = await createClient()
 

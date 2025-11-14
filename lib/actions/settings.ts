@@ -2,8 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { applyThrottle } from "@/lib/throttle"
 
 export async function updateUserPreferences(formData: FormData) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const {
@@ -35,6 +38,8 @@ export async function updateUserPreferences(formData: FormData) {
 }
 
 export async function getUserPreferences(userId: string) {
+  await applyThrottle()
+
   const supabase = await createClient()
 
   const { data, error } = await supabase.from("user_preferences").select("*").eq("user_id", userId).single()
