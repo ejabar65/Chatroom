@@ -137,6 +137,11 @@ function CardLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
                     className={`font-medium ${isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400" : ""}`}
                   >
                     {post.users.full_name || post.users.email}
+                    {post.users.full_name && post.users.full_name !== post.users.email && (
+                      <span className="text-xs text-muted-foreground font-normal ml-1">
+                        ({post.users.email})
+                      </span>
+                    )}
                   </span>
                   {getRoleBadge(post.users.memberRole)}
                   <span className="text-sm text-muted-foreground">
@@ -219,6 +224,9 @@ function ListLayout({ posts, currentUser }: { posts: any[]; currentUser: any }) 
                       }
                     >
                       {post.users.full_name || "Student"}
+                      {post.users.full_name && post.users.full_name !== post.users.email && (
+                        <span className="ml-1">({post.users.email})</span>
+                      )}
                     </span>
                     {getRoleBadge(post.users.memberRole)}
                     <span>•</span>
@@ -283,6 +291,9 @@ function CompactLayout({ posts, currentUser }: { posts: any[]; currentUser: any 
                       }
                     >
                       {post.users.full_name || "Student"}
+                      {post.users.full_name && post.users.full_name !== post.users.email && (
+                        <span className="ml-1">({post.users.email})</span>
+                      )}
                     </span>
                     {getRoleBadge(post.users.memberRole)}
                   </div>

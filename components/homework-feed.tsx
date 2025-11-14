@@ -21,6 +21,7 @@ interface Post {
   users: {
     id: string
     full_name: string | null
+    original_name: string | null
     avatar_url: string | null
     email: string
     memberRole?: string | null // Added member role
@@ -122,6 +123,9 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
             .join("")
             .toUpperCase() || post.users.email[0].toUpperCase()
 
+        const displayName = post.users.full_name || "Student"
+        const hasCustomName = post.users.full_name && post.users.original_name && post.users.full_name !== post.users.original_name
+
         return (
           <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
@@ -152,7 +156,12 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                       <p
                         className={`font-medium text-sm ${isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400" : ""}`}
                       >
-                        {post.users.full_name || "Student"}
+                        {displayName}
+                        {hasCustomName && (
+                          <span className="text-xs text-muted-foreground font-normal ml-1">
+                            ({post.users.original_name})
+                          </span>
+                        )}
                       </p>
                       {getRoleBadge(post.users.memberRole)}
                     </div>
@@ -220,6 +229,9 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
             .join("")
             .toUpperCase() || post.users.email[0].toUpperCase()
 
+        const displayName = post.users.full_name || "Student"
+        const hasCustomName = post.users.full_name && post.users.original_name && post.users.full_name !== post.users.original_name
+
         return (
           <Link key={post.id} href={`/post/${post.id}`}>
             <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
@@ -258,7 +270,8 @@ function ListLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                         isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""
                       }
                     >
-                      {post.users.full_name || "Student"}
+                      {displayName}
+                      {hasCustomName && <span className="ml-1">({post.users.original_name})</span>}
                     </span>
                     {getRoleBadge(post.users.memberRole)}
                     <span>•</span>
@@ -295,6 +308,9 @@ function CompactLayout({ posts, currentUser }: { posts: Post[]; currentUser: { i
       {posts.map((post) => {
         const commentCount = post.comments?.[0]?.count || 0
 
+        const displayName = post.users.full_name || "Student"
+        const hasCustomName = post.users.full_name && post.users.original_name && post.users.full_name !== post.users.original_name
+
         return (
           <Link key={post.id} href={`/post/${post.id}`}>
             <Card className="p-3 hover:shadow-md transition-shadow cursor-pointer">
@@ -322,7 +338,8 @@ function CompactLayout({ posts, currentUser }: { posts: Post[]; currentUser: { i
                         isAdmin(post.users.memberRole) ? "text-yellow-600 dark:text-yellow-400 font-medium" : ""
                       }
                     >
-                      {post.users.full_name || "Student"}
+                      {displayName}
+                      {hasCustomName && <span className="ml-1">({post.users.original_name})</span>}
                     </span>
                     {getRoleBadge(post.users.memberRole)}
                   </div>

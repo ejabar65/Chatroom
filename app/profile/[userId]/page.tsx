@@ -71,6 +71,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ userId
 
   const isOwnProfile = currentUser.id === userId
 
+  const hasCustomName = profileUser.full_name && profileUser.full_name !== profileUser.email
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       {/* Profile Header */}
@@ -95,14 +97,22 @@ export default async function ProfilePage({ params }: { params: Promise<{ userId
                   className={`text-3xl font-bold ${profileUser.is_admin ? "text-yellow-600 dark:text-yellow-400" : ""}`}
                 >
                   {profileUser.full_name || "Student"}
+                  {hasCustomName && (
+                    <span className="text-xl text-muted-foreground font-normal ml-2">
+                      ({profileUser.email})
+                    </span>
+                  )}
                 </h1>
+                {/* </CHANGE> */}
                 {profileUser.is_admin && (
                   <Badge variant="destructive" className="text-sm">
                     Admin
                   </Badge>
                 )}
               </div>
-              <p className="text-muted-foreground mb-4">{profileUser.email}</p>
+              {!hasCustomName && (
+                <p className="text-muted-foreground mb-4">{profileUser.email}</p>
+              )}
 
               {profileUser.bio && (
                 <div className="mb-4 p-3 bg-muted/50 rounded-lg">

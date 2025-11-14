@@ -4,7 +4,7 @@ import { HomeworkFeed } from "@/components/homework-feed"
 import { Header } from "@/components/header"
 import { CommunitiesSidebar } from "@/components/communities-sidebar"
 import { MusicSidebar } from "@/components/music-sidebar"
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation'
 
 export default async function HomePage() {
   const user = await getCurrentUser()
@@ -24,6 +24,7 @@ export default async function HomePage() {
       users:user_id (
         id,
         full_name,
+        original_name,
         avatar_url,
         email
       ),

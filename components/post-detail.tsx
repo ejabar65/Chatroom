@@ -72,6 +72,10 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
       .join("")
       .toUpperCase() || post.users.email[0].toUpperCase()
 
+  const postAuthorDisplayName = post.users.full_name || "Student"
+  const postAuthorHasCustomName = post.users.full_name && post.users.full_name !== post.users.email
+  // </CHANGE>
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!comment.trim()) return
@@ -152,8 +156,14 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
               {/* </CHANGE> */}
               <div>
                 <p className={`font-medium ${isAdmin(post.users) ? "text-yellow-600 dark:text-yellow-400" : ""}`}>
-                  {post.users.full_name || "Student"}
+                  {postAuthorDisplayName}
+                  {postAuthorHasCustomName && (
+                    <span className="text-xs text-muted-foreground font-normal ml-1">
+                      ({post.users.email})
+                    </span>
+                  )}
                 </p>
+                {/* </CHANGE> */}
                 <p className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                 </p>
@@ -227,6 +237,10 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                       .join("")
                       .toUpperCase() || comment.users.email[0].toUpperCase()
 
+                  const commentAuthorDisplayName = comment.users.full_name || "Student"
+                  const commentAuthorHasCustomName = comment.users.full_name && comment.users.full_name !== comment.users.email
+                  // </CHANGE>
+
                   return (
                     <div key={comment.id} className="flex gap-3 p-4 rounded-lg bg-muted/50">
                       <Link href={`/profile/${comment.users.id}`}>
@@ -242,14 +256,19 @@ export function PostDetail({ post, currentUser }: PostDetailProps) {
                           )}
                         </div>
                       </Link>
-                      {/* </CHANGE> */}
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                           <p
                             className={`font-medium text-sm ${isAdmin(comment.users) ? "text-yellow-600 dark:text-yellow-400" : ""}`}
                           >
-                            {comment.users.full_name || "Student"}
+                            {commentAuthorDisplayName}
+                            {commentAuthorHasCustomName && (
+                              <span className="text-xs text-muted-foreground font-normal ml-1">
+                                ({comment.users.email})
+                              </span>
+                            )}
                           </p>
+                          {/* </CHANGE> */}
                           <p className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                           </p>
