@@ -35,9 +35,9 @@ export default async function HomePage() {
       ),
       comments (count)
     `)
+    .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false })
 
-  // Fetch member roles for each post author in their respective communities
   const postsWithRoles = await Promise.all(
     (posts || []).map(async (post) => {
       if (post.community_id && post.user_id) {

@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BookOpenIcon, LogOutIcon, ShieldIcon, SettingsIcon, GridIcon } from "@/components/icons"
+import { BookOpenIcon, LogOutIcon, ShieldIcon, SettingsIcon, GridIcon, BookmarkIcon } from "@/components/icons"
+import { Search } from 'lucide-react'
 import Link from "next/link"
 
 interface HeaderProps {
@@ -43,10 +44,24 @@ export function Header({ user }: HeaderProps) {
             <h1 className="text-xl font-bold text-foreground">Homework Helper</h1>
           </Link>
 
+          <Link href="/search">
+            <Button variant="ghost" size="sm">
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+          </Link>
+
           <Link href="/communities">
             <Button variant="ghost" size="sm">
               <GridIcon className="w-4 h-4 mr-2" />
               Boards
+            </Button>
+          </Link>
+
+          <Link href="/bookmarks">
+            <Button variant="ghost" size="sm">
+              <BookmarkIcon className="w-4 h-4 mr-2" />
+              Saved
             </Button>
           </Link>
         </div>

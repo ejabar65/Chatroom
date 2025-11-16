@@ -7,7 +7,7 @@ import { applyThrottle } from "@/lib/throttle"
 
 const ADMIN_KEY = "$#GS29gs1"
 
-export async function createComment(postId: string, content: string) {
+export async function createComment(postId: string, content: string, parentCommentId?: string, quotedText?: string) {
   await applyThrottle()
 
   try {
@@ -24,6 +24,19 @@ export async function createComment(postId: string, content: string) {
       return { success: false, error: "Comment cannot be empty" }
     }
 
+    const { data: post } = await supabase
+      .from("homework_posts")
+      .select("is_locked, lock_reason")
+      .eq("id", postId)
+      .single()
+
+    if (post?.is_locked) {
+      return { 
+        success: false, 
+        error: `This post is locked. ${post.lock_reason ? `Reason: ${post.lock_reason}` : ''}` 
+      }
+    }
+
     const contentCheck = strictContentFilter(content)
     if (!contentCheck.safe) {
       return { success: false, error: contentCheck.reason }
@@ -33,6 +46,8 @@ export async function createComment(postId: string, content: string) {
       post_id: postId,
       user_id: user.id,
       content: content.trim(),
+      parent_comment_id: parentCommentId || null,
+      quoted_text: quotedText || null,
     })
 
     if (error) {

@@ -5,10 +5,11 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MessageCircleIcon, AlertTriangleIcon, BookOpenIcon, CrownIcon } from "@/components/icons"
+import { MessageCircleIcon, AlertTriangleIcon, BookOpenIcon, CrownIcon, PinIcon, LockIcon } from "@/components/icons"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import { ReactionBar } from "@/components/reaction-bar"
+import { BookmarkButton } from "@/components/bookmark-button"
 
 interface Post {
   id: string
@@ -18,13 +19,17 @@ interface Post {
   subject: string | null
   is_flagged: boolean
   created_at: string
+  is_pinned?: boolean
+  is_locked?: boolean
+  flair_text?: string | null
+  flair_color?: string | null
   users: {
     id: string
     full_name: string | null
     original_name: string | null
     avatar_url: string | null
     email: string
-    memberRole?: string | null // Added member role
+    memberRole?: string | null
   }
   communities?: {
     id: string
@@ -57,7 +62,7 @@ export function HomeworkFeed({ initialPosts, currentUser, layout = "card" }: Hom
       } catch (error) {
         console.error("Failed to refresh posts:", error)
       }
-    }, 200)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [])
@@ -128,6 +133,13 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
 
         return (
           <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            {post.is_pinned && (
+              <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 flex items-center gap-2">
+                <PinIcon className="w-4 h-4 text-yellow-600 dark:text-yellow-500" />
+                <span className="text-sm font-medium text-yellow-700 dark:text-yellow-400">Pinned Post</span>
+              </div>
+            )}
+            
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -171,9 +183,23 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {post.flair_text && (
+                    <Badge
+                      className="text-xs"
+                      style={{ backgroundColor: post.flair_color || "#3b82f6", color: "#fff" }}
+                    >
+                      {post.flair_text}
+                    </Badge>
+                  )}
                   {post.subject && (
                     <Badge variant="secondary" className="text-xs">
                       {post.subject}
+                    </Badge>
+                  )}
+                  {post.is_locked && (
+                    <Badge variant="outline" className="text-xs">
+                      <LockIcon className="w-3 h-3 mr-1" />
+                      Locked
                     </Badge>
                   )}
                   {post.is_flagged && currentUser.is_admin && (
@@ -201,14 +227,17 @@ function CardLayout({ posts, currentUser }: { posts: Post[]; currentUser: { id: 
             <CardFooter className="pt-3 flex-col gap-3">
               <ReactionBar targetId={post.id} targetType="post" userId={currentUser.id} />
 
-              <Link href={`/post/${post.id}`} className="w-full">
-                <Button variant="outline" className="w-full bg-transparent">
-                  <MessageCircleIcon className="w-4 h-4 mr-2" />
-                  {commentCount === 0
-                    ? "Be the first to help"
-                    : `${commentCount} ${commentCount === 1 ? "response" : "responses"}`}
-                </Button>
-              </Link>
+              <div className="w-full flex gap-2">
+                <Link href={`/post/${post.id}`} className="flex-1">
+                  <Button variant="outline" className="w-full bg-transparent">
+                    <MessageCircleIcon className="w-4 h-4 mr-2" />
+                    {commentCount === 0
+                      ? "Be the first to help"
+                      : `${commentCount} ${commentCount === 1 ? "response" : "responses"}`}
+                  </Button>
+                </Link>
+                <BookmarkButton postId={post.id} userId={currentUser.id} size="default" showLabel={false} />
+              </div>
             </CardFooter>
           </Card>
         )

@@ -20,9 +20,14 @@ import {
   FlagIcon,
   CheckCircleIcon,
   CheckIcon,
+  BookmarkIcon as HeroBookmarkIcon,
+  ChatBubbleLeftRightIcon,
+  LockClosedIcon,
+  ClockIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline"
 
-import { TrophyIcon } from "@heroicons/react/24/solid"
+import { TrophyIcon as HeroTrophyIcon, MapPinIcon } from "@heroicons/react/24/solid"
 
 export { BookOpenIcon }
 export { PlusIcon }
@@ -32,11 +37,16 @@ export { UsersIcon }
 export { FlagIcon }
 export { CheckCircleIcon }
 export { CheckIcon }
-export { ArrowPathIcon } // Export ArrowPathIcon from outline
+export { ArrowPathIcon }
 
-export function CrownIcon({ className }: { className?: string }) {
-  return <TrophyIcon className={className} />
+export const TrophyIcon = HeroTrophyIcon
+
+export function LockIcon({ className }: { className?: string }) {
+  return <LockClosedIcon className={className} />
 }
+
+// Export LockIconComponent as an alias export for backward compatibility
+export const LockIconComponent = LockIcon
 
 export function MessageCircleIcon({ className }: { className?: string }) {
   return <ChatBubbleLeftIcon className={className} />
@@ -100,4 +110,28 @@ export function FileTextIcon({ className }: { className?: string }) {
 
 export function FileIcon({ className }: { className?: string }) {
   return <DocumentTextIcon className={className} />
+}
+
+export function BookmarkIcon({ className }: { className?: string }) {
+  return <HeroBookmarkIcon className={className} />
+}
+
+export function QuoteIcon({ className }: { className?: string }) {
+  return <ChatBubbleLeftRightIcon className={className} />
+}
+
+export function PinIcon({ className }: { className?: string }) {
+  return <MapPinIcon className={className} />
+}
+
+export function CrownIcon({ className }: { className?: string }) {
+  return <HeroTrophyIcon className={className} />
+}
+
+export function HistoryIcon({ className }: { className?: string }) {
+  return <ClockIcon className={className} />
+}
+
+export function TagIconComponent({ className }: { className?: string }) {
+  return <TagIcon className={className} />
 }

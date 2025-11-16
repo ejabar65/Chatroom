@@ -18,7 +18,6 @@ export default async function PostPage({ params }: PostPageProps) {
 
   const supabase = await createClient()
 
-  // Fetch post with user info and comments
   const { data: post, error } = await supabase
     .from("homework_posts")
     .select(`
@@ -27,15 +26,19 @@ export default async function PostPage({ params }: PostPageProps) {
         id,
         full_name,
         avatar_url,
+        email,
         original_name,
         is_admin
       ),
       comments (
         *,
+        parent_comment_id,
+        quoted_text,
         users:user_id (
           id,
           full_name,
           avatar_url,
+          email,
           original_name,
           is_admin
         )
@@ -49,7 +52,7 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       <Header user={user} />
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <PostDetail post={post} currentUser={user} />

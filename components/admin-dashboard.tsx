@@ -24,7 +24,8 @@ import {
 import { formatDistanceToNow } from "date-fns"
 import { flagPost, unflagPost, deletePost } from "@/lib/actions/posts"
 import { flagComment, unflagComment, deleteComment } from "@/lib/actions/comments"
-import { banUser, unbanUser, toggleAdminStatus, toggleThrottleStatus } from "@/lib/actions/users"
+import { banUser, unbanUser, toggleAdminStatus, toggleThrottleStatus, shadowbanUser, unshadowbanUser } from "@/lib/actions/users"
+import { updateReportStatus } from "@/lib/actions/reports"
 import Link from "next/link"
 
 interface Post {
@@ -70,28 +71,59 @@ interface User {
   created_at: string
   is_admin: boolean
   is_banned: boolean
+  is_shadowbanned: boolean
   is_throttled: boolean
   ban_reason: string | null
+  shadowban_reason: string | null
   banned_at: string | null
+  shadowbanned_at: string | null
+}
+
+interface Report {
+  id: string
+  reason: string
+  status: string
+  created_at: string
+  reporter: {
+    id: string
+    full_name: string | null
+    email: string
+  }
+  reported_user?: {
+    id: string
+    full_name: string | null
+    email: string
+  } | null
+  reported_post?: {
+    id: string
+    title: string
+  } | null
+  reported_comment?: {
+    id: string
+    content: string
+  } | null
 }
 
 interface AdminDashboardProps {
   posts: Post[]
   comments: Comment[]
   users: User[]
+  reports: Report[]
   stats: {
     totalPosts: number
     flaggedPosts: number
     totalComments: number
     flaggedComments: number
     totalUsers: number
+    pendingReports: number
   }
 }
 
-export function AdminDashboard({ posts, comments, users, stats }: AdminDashboardProps) {
+export function AdminDashboard({ posts, comments, users, reports, stats }: AdminDashboardProps) {
   const router = useRouter()
   const [flagReason, setFlagReason] = useState<{ [key: string]: string }>({})
   const [banReason, setBanReason] = useState<{ [key: string]: string }>({})
+  const [shadowbanReason, setShadowbanReason] = useState<{ [key: string]: string }>({})
 
   const getAdminKey = () => {
     if (typeof window !== "undefined") {
@@ -208,6 +240,38 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
     }
   }
 
+  const handleShadowbanUser = async (userId: string) => {
+    const reason = shadowbanReason[userId] || "Suspicious activity"
+    if (!confirm(`Are you sure you want to shadowban this user?\nReason: ${reason}`)) return
+    const adminKey = getAdminKey()
+    const result = await shadowbanUser(userId, reason, adminKey)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
+  const handleUnshadowbanUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to remove shadowban from this user?")) return
+    const adminKey = getAdminKey()
+    const result = await unshadowbanUser(userId, adminKey)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
+  const handleReportAction = async (reportId: string, status: string) => {
+    const result = await updateReportStatus(reportId, status)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -221,7 +285,7 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
@@ -281,16 +345,117 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Reports</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <AlertIcon className="w-5 h-5 text-purple-600" />
+              <span className="text-2xl font-bold">{stats.pendingReports}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Content Management Tabs */}
-      <Tabs defaultValue="posts" className="space-y-4">
+      <Tabs defaultValue="reports" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="reports">Reports ({reports.length})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({posts.length})</TabsTrigger>
           <TabsTrigger value="comments">Comments ({comments.length})</TabsTrigger>
           <TabsTrigger value="flagged">Flagged Content ({stats.flaggedPosts + stats.flaggedComments})</TabsTrigger>
           <TabsTrigger value="users">Users ({users.length})</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="reports" className="space-y-4">
+          {reports.length === 0 ? (
+            <div className="text-center py-12">
+              <CheckIcon className="w-16 h-16 mx-auto text-green-600 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No Reports</h3>
+              <p className="text-muted-foreground">All clear! No reports to review</p>
+            </div>
+          ) : (
+            reports.map((report) => (
+              <Card key={report.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="font-medium text-sm">
+                          Reported by: {report.reporter.full_name || report.reporter.email}
+                        </p>
+                        <Badge
+                          variant={
+                            report.status === "pending"
+                              ? "default"
+                              : report.status === "resolved"
+                              ? "secondary"
+                              : "outline"
+                          }
+                        >
+                          {report.status}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm font-medium mb-1">Report Reason:</p>
+                    <p className="text-sm">{report.reason}</p>
+                  </div>
+
+                  {report.reported_user && (
+                    <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">Reported User:</p>
+                      <Link href={`/profile/${report.reported_user.id}`} className="text-sm text-red-600 dark:text-red-400 hover:underline">
+                        {report.reported_user.full_name || report.reported_user.email}
+                      </Link>
+                    </div>
+                  )}
+
+                  {report.reported_post && (
+                    <div className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                      <p className="text-sm font-medium text-orange-700 dark:text-orange-400 mb-1">Reported Post:</p>
+                      <Link href={`/post/${report.reported_post.id}`} className="text-sm text-orange-600 dark:text-orange-400 hover:underline">
+                        {report.reported_post.title}
+                      </Link>
+                    </div>
+                  )}
+
+                  {report.reported_comment && (
+                    <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400 mb-1">Reported Comment:</p>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-400 line-clamp-2">
+                        {report.reported_comment.content}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="flex gap-2">
+                  {report.status === "pending" && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => handleReportAction(report.id, "reviewed")}>
+                        Mark Reviewed
+                      </Button>
+                      <Button variant="default" size="sm" onClick={() => handleReportAction(report.id, "resolved")}>
+                        Resolve
+                      </Button>
+                      <Button variant="secondary" size="sm" onClick={() => handleReportAction(report.id, "dismissed")}>
+                        Dismiss
+                      </Button>
+                    </>
+                  )}
+                </CardFooter>
+              </Card>
+            ))
+          )}
+        </TabsContent>
 
         <TabsContent value="posts" className="space-y-4">
           {posts.map((post) => {
@@ -640,6 +805,11 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                           Banned
                         </Badge>
                       )}
+                      {user.is_shadowbanned && (
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-400">
+                          Shadowbanned
+                        </Badge>
+                      )}
                       {user.is_throttled && (
                         <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                           Throttled
@@ -656,6 +826,17 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                       {user.banned_at && (
                         <p className="text-xs text-destructive/60 mt-1">
                           Banned {formatDistanceToNow(new Date(user.banned_at), { addSuffix: true })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {user.is_shadowbanned && user.shadowban_reason && (
+                    <div className="p-3 bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                      <p className="text-sm font-medium text-purple-700 dark:text-purple-400">Shadowban Reason:</p>
+                      <p className="text-sm text-purple-600 dark:text-purple-400">{user.shadowban_reason}</p>
+                      {user.shadowbanned_at && (
+                        <p className="text-xs text-purple-500 dark:text-purple-500 mt-1">
+                          Shadowbanned {formatDistanceToNow(new Date(user.shadowbanned_at), { addSuffix: true })}
                         </p>
                       )}
                     </div>
@@ -679,6 +860,23 @@ export function AdminDashboard({ posts, comments, users, stats }: AdminDashboard
                     <Button variant="outline" size="sm" onClick={() => handleUnbanUser(user.id)}>
                       <CheckIcon className="w-4 h-4 mr-2" />
                       Unban User
+                    </Button>
+                  )}
+                  {!user.is_shadowbanned ? (
+                    <>
+                      <Input
+                        placeholder="Shadowban reason..."
+                        value={shadowbanReason[user.id] || ""}
+                        onChange={(e) => setShadowbanReason({ ...shadowbanReason, [user.id]: e.target.value })}
+                        className="max-w-xs"
+                      />
+                      <Button variant="secondary" size="sm" onClick={() => handleShadowbanUser(user.id)}>
+                        Shadowban
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={() => handleUnshadowbanUser(user.id)}>
+                      Remove Shadowban
                     </Button>
                   )}
                   <Button

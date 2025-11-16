@@ -13,7 +13,17 @@ export default async function AdminPage() {
 
   const supabase = await createClient()
 
-  // Fetch all posts including flagged ones
+  const { data: reports } = await supabase
+    .from("reports")
+    .select(`
+      *,
+      reporter:reporter_id (id, full_name, email),
+      reported_user:reported_user_id (id, full_name, email),
+      reported_post:reported_post_id (id, title),
+      reported_comment:reported_comment_id (id, content)
+    `)
+    .order("created_at", { ascending: false })
+
   const { data: posts } = await supabase
     .from("homework_posts")
     .select(`
@@ -28,7 +38,6 @@ export default async function AdminPage() {
     `)
     .order("created_at", { ascending: false })
 
-  // Fetch all comments including flagged ones
   const { data: comments } = await supabase
     .from("comments")
     .select(`
@@ -48,7 +57,6 @@ export default async function AdminPage() {
 
   const { data: allUsers } = await supabase.from("users").select("*").order("created_at", { ascending: false })
 
-  // Get statistics
   const { count: totalPosts } = await supabase.from("homework_posts").select("*", { count: "exact", head: true })
 
   const { count: flaggedPosts } = await supabase
@@ -65,6 +73,11 @@ export default async function AdminPage() {
 
   const { count: totalUsers } = await supabase.from("users").select("*", { count: "exact", head: true })
 
+  const { count: pendingReports } = await supabase
+    .from("reports")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "pending")
+
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
@@ -73,12 +86,14 @@ export default async function AdminPage() {
           posts={posts || []}
           comments={comments || []}
           users={allUsers || []}
+          reports={reports || []}
           stats={{
             totalPosts: totalPosts || 0,
             flaggedPosts: flaggedPosts || 0,
             totalComments: totalComments || 0,
             flaggedComments: flaggedComments || 0,
             totalUsers: totalUsers || 0,
+            pendingReports: pendingReports || 0,
           }}
         />
       </main>

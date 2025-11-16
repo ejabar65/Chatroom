@@ -21,6 +21,7 @@ import {
 import { Upload, X, Loader2, Plus } from 'lucide-react'
 import { createPost } from "@/lib/actions/posts"
 import { getCommunities, createCommunity } from "@/lib/actions/communities"
+import { Badge } from "@/components/ui/badge"
 
 interface PostFormProps {
   userId: string
@@ -58,6 +59,8 @@ const SUBJECTS = [
   "Other",
 ]
 
+const DRAFT_STORAGE_KEY = "homework_post_draft"
+
 export function PostForm({ userId }: PostFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -73,6 +76,56 @@ export function PostForm({ userId }: PostFormProps) {
     subject: "",
     communityId: "",
   })
+  const [hasDraft, setHasDraft] = useState(false)
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY)
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft)
+        setHasDraft(true)
+      } catch (error) {
+        console.error("[v0] Failed to parse draft:", error)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      if (formData.title || formData.description) {
+        const draft = {
+          ...formData,
+          timestamp: new Date().toISOString(),
+        }
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft))
+      }
+    }, 2000)
+
+    return () => clearTimeout(saveTimeout)
+  }, [formData])
+
+  const loadDraft = () => {
+    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY)
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft)
+        setFormData({
+          title: draft.title || "",
+          description: draft.description || "",
+          subject: draft.subject || "",
+          communityId: draft.communityId || "",
+        })
+        setHasDraft(false)
+      } catch (error) {
+        console.error("[v0] Failed to load draft:", error)
+      }
+    }
+  }
+
+  const discardDraft = () => {
+    localStorage.removeItem(DRAFT_STORAGE_KEY)
+    setHasDraft(false)
+  }
 
   useEffect(() => {
     async function fetchCommunities() {
@@ -174,6 +227,7 @@ export function PostForm({ userId }: PostFormProps) {
       const result = await createPost(formDataToSend)
 
       if (result.success) {
+        localStorage.removeItem(DRAFT_STORAGE_KEY)
         router.push("/")
         router.refresh()
       } else {
@@ -189,10 +243,38 @@ export function PostForm({ userId }: PostFormProps) {
 
   return (
     <>
+      {hasDraft && (
+        <Card className="mb-4 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-amber-900 dark:text-amber-100">Draft Saved</p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  You have an unsaved draft from a previous session
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={discardDraft}>
+                  Discard
+                </Button>
+                <Button size="sm" onClick={loadDraft} className="bg-amber-600 hover:bg-amber-700">
+                  Load Draft
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <CardTitle>Homework Details</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Homework Details</CardTitle>
+              <Badge variant="outline" className="text-xs">
+                Markdown supported
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -297,7 +379,7 @@ export function PostForm({ userId }: PostFormProps) {
               <Label htmlFor="description">Additional Details</Label>
               <Textarea
                 id="description"
-                placeholder="Describe what you're struggling with or what specific help you need..."
+                placeholder="Describe what you're struggling with... (Markdown supported: **bold**, *italic*, `code`, etc.)"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}

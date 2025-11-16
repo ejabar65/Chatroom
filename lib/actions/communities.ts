@@ -86,7 +86,6 @@ export async function createCommunity(formData: FormData) {
     }
   }
 
-  // Create URL-friendly name
   const urlName = name.toLowerCase().replace(/[^a-z0-9]/g, "")
 
   if (urlName.length < 3) {
@@ -108,7 +107,6 @@ export async function createCommunity(formData: FormData) {
     return { success: false, error: error.message }
   }
 
-  // Auto-join creator as admin
   await supabase.from("community_members").insert({
     community_id: data.id,
     user_id: user.id,
@@ -186,4 +184,86 @@ export async function getUserCommunities(userId: string) {
   }
 
   return { success: true, data: data.map((item) => item.communities) }
+}
+
+export async function updateMemberRole(communityId: string, userId: string, role: string) {
+  await applyThrottle()
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: "Not authenticated" }
+  }
+
+  // Check if current user is admin of the community
+  const { data: membership } = await supabase
+    .from("community_members")
+    .select("role")
+    .match({ community_id: communityId, user_id: user.id })
+    .single()
+
+  if (membership?.role !== "admin") {
+    return { success: false, error: "Not authorized - admin access required" }
+  }
+
+  // Update member role and permissions
+  const canModerate = role === "moderator" || role === "admin"
+  const canPinPosts = canModerate
+  const canLockPosts = canModerate
+
+  const { error } = await supabase
+    .from("community_members")
+    .update({
+      role,
+      can_moderate: canModerate,
+      can_pin_posts: canPinPosts,
+      can_lock_posts: canLockPosts,
+    })
+    .match({ community_id: communityId, user_id: userId })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath(`/c/${communityId}`)
+  return { success: true }
+}
+
+export async function removeMember(communityId: string, userId: string) {
+  await applyThrottle()
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: "Not authenticated" }
+  }
+
+  // Check if current user is admin of the community
+  const { data: membership } = await supabase
+    .from("community_members")
+    .select("role")
+    .match({ community_id: communityId, user_id: user.id })
+    .single()
+
+  if (membership?.role !== "admin") {
+    return { success: false, error: "Not authorized - admin access required" }
+  }
+
+  const { error } = await supabase
+    .from("community_members")
+    .delete()
+    .match({ community_id: communityId, user_id: userId })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath(`/c/${communityId}`)
+  return { success: true }
 }
