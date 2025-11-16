@@ -26,6 +26,7 @@ import { flagPost, unflagPost, deletePost } from "@/lib/actions/posts"
 import { flagComment, unflagComment, deleteComment } from "@/lib/actions/comments"
 import { banUser, unbanUser, toggleAdminStatus, toggleThrottleStatus, shadowbanUser, unshadowbanUser } from "@/lib/actions/users"
 import { updateReportStatus } from "@/lib/actions/reports"
+import { deleteCommunity } from "@/lib/actions/communities"
 import Link from "next/link"
 
 interface Post {
@@ -104,11 +105,27 @@ interface Report {
   } | null
 }
 
+interface Community {
+  id: string
+  name: string
+  display_name: string
+  description: string | null
+  member_count: number
+  post_count: number
+  created_at: string
+  creator: {
+    id: string
+    full_name: string | null
+    email: string
+  }
+}
+
 interface AdminDashboardProps {
   posts: Post[]
   comments: Comment[]
   users: User[]
   reports: Report[]
+  communities: Community[]
   stats: {
     totalPosts: number
     flaggedPosts: number
@@ -119,7 +136,7 @@ interface AdminDashboardProps {
   }
 }
 
-export function AdminDashboard({ posts, comments, users, reports, stats }: AdminDashboardProps) {
+export function AdminDashboard({ posts, comments, users, reports, communities, stats }: AdminDashboardProps) {
   const router = useRouter()
   const [flagReason, setFlagReason] = useState<{ [key: string]: string }>({})
   const [banReason, setBanReason] = useState<{ [key: string]: string }>({})
@@ -272,6 +289,17 @@ export function AdminDashboard({ posts, comments, users, reports, stats }: Admin
     }
   }
 
+  const handleDeleteCommunity = async (communityId: string, communityName: string) => {
+    if (!confirm(`Are you sure you want to delete the board "${communityName}"?\n\nThis will also delete all posts and members in this board. This action cannot be undone.`)) return
+    const adminKey = getAdminKey()
+    const result = await deleteCommunity(communityId, adminKey)
+    if (result.success) {
+      router.refresh()
+    } else {
+      alert(result.error)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -367,6 +395,7 @@ export function AdminDashboard({ posts, comments, users, reports, stats }: Admin
           <TabsTrigger value="comments">Comments ({comments.length})</TabsTrigger>
           <TabsTrigger value="flagged">Flagged Content ({stats.flaggedPosts + stats.flaggedComments})</TabsTrigger>
           <TabsTrigger value="users">Users ({users.length})</TabsTrigger>
+          <TabsTrigger value="boards">Boards ({communities.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="reports" className="space-y-4">
@@ -898,6 +927,67 @@ export function AdminDashboard({ posts, comments, users, reports, stats }: Admin
               </Card>
             )
           })}
+        </TabsContent>
+
+        <TabsContent value="boards" className="space-y-4">
+          {communities.length === 0 ? (
+            <div className="text-center py-12">
+              <FileIcon className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No Boards</h3>
+              <p className="text-muted-foreground">No boards have been created yet</p>
+            </div>
+          ) : (
+            communities.map((community) => (
+              <Card key={community.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold text-lg">{community.display_name}</h3>
+                        <Badge variant="secondary">/{community.name}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Created by: {community.creator.full_name || community.creator.email}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(community.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Badge variant="outline">
+                        <UsersIcon className="w-3 h-3 mr-1" />
+                        {community.member_count} members
+                      </Badge>
+                      <Badge variant="outline">
+                        <FileIcon className="w-3 h-3 mr-1" />
+                        {community.post_count} posts
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                {community.description && (
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{community.description}</p>
+                  </CardContent>
+                )}
+                <CardFooter className="flex gap-2">
+                  <Link href={`/c/${community.name}`}>
+                    <Button variant="outline" size="sm">
+                      View Board
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={() => handleDeleteCommunity(community.id, community.display_name)}
+                  >
+                    <TrashIcon className="w-4 h-4 mr-2" />
+                    Delete Board
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))
+          )}
         </TabsContent>
       </Tabs>
     </div>

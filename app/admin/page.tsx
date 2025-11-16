@@ -57,6 +57,18 @@ export default async function AdminPage() {
 
   const { data: allUsers } = await supabase.from("users").select("*").order("created_at", { ascending: false })
 
+  const { data: communities } = await supabase
+    .from("communities")
+    .select(`
+      *,
+      creator:creator_id (
+        id,
+        full_name,
+        email
+      )
+    `)
+    .order("created_at", { ascending: false })
+
   const { count: totalPosts } = await supabase.from("homework_posts").select("*", { count: "exact", head: true })
 
   const { count: flaggedPosts } = await supabase
@@ -87,6 +99,7 @@ export default async function AdminPage() {
           comments={comments || []}
           users={allUsers || []}
           reports={reports || []}
+          communities={communities || []}
           stats={{
             totalPosts: totalPosts || 0,
             flaggedPosts: flaggedPosts || 0,

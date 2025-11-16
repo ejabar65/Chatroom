@@ -267,3 +267,37 @@ export async function removeMember(communityId: string, userId: string) {
   revalidatePath(`/c/${communityId}`)
   return { success: true }
 }
+
+export async function deleteCommunity(communityId: string, adminKey?: string) {
+  await applyThrottle()
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: "Not authenticated" }
+  }
+
+  // Check if user is admin (either via admin key or is_admin flag)
+  const { data: userData } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+
+  const isValidAdminKey = adminKey === process.env.ADMIN_SECRET_KEY
+  const isAdmin = userData?.is_admin || isValidAdminKey
+
+  if (!isAdmin) {
+    return { success: false, error: "Not authorized - admin access required" }
+  }
+
+  // Delete the community (cascade deletes will handle community_members and posts)
+  const { error } = await supabase.from("communities").delete().eq("id", communityId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath("/")
+  revalidatePath("/admin")
+  return { success: true }
+}
