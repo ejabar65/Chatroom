@@ -33,8 +33,8 @@ CREATE POLICY "Admins can manage advertisements"
 -- Insert Yeebs Media advertisement
 INSERT INTO advertisements (title, description, image_url, link_url, position, is_active)
 VALUES 
-  ('Yeebs Media - Movies & Albums on CD', 'Shop our collection of movies and albums on CD. Quality entertainment delivered to your door!', '/placeholder.svg?height=400&width=300', 'https://yeebsmedia.vercel.app/', 'sidebar', true),
-  ('Yeebs Media CD Collection', 'Discover our extensive collection of movies and music on CD. Browse now!', '/placeholder.svg?height=200&width=800', 'https://yeebsmedia.vercel.app/', 'banner', true);
+  ('Yeebs Media - Movies & Albums on CD', 'Shop our collection of movies and albums on CD. Quality entertainment delivered to your door!', 'https://image.prntscr.com/image/dhAn5694SBSPEMaEc8JPWQ.png', 'https://yeebsmedia.vercel.app/', 'sidebar', true),
+  ('Yeebs Media CD Collection', 'Discover our extensive collection of movies and music on CD. Browse now!', 'https://image.prntscr.com/image/dhAn5694SBSPEMaEc8JPWQ.png', 'https://yeebsmedia.vercel.app/', 'banner', true);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_advertisement_updated_at()
