@@ -4,6 +4,9 @@ import { HomeworkFeed } from "@/components/homework-feed"
 import { Header } from "@/components/header"
 import { CommunitiesSidebar } from "@/components/communities-sidebar"
 import { MusicSidebar } from "@/components/music-sidebar"
+import { SidebarAd } from "@/components/sidebar-ad"
+import { BannerAd } from "@/components/banner-ad"
+import { getActiveAds } from "@/lib/actions/advertisements"
 import { redirect } from 'next/navigation'
 
 export default async function HomePage() {
@@ -59,13 +62,18 @@ export default async function HomePage() {
     }),
   )
 
+  const sidebarAds = await getActiveAds('sidebar')
+  const bannerAds = await getActiveAds('banner')
+
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main feed */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 space-y-6">
+            {bannerAds[0] && <BannerAd ad={bannerAds[0]} />}
+            
             <HomeworkFeed
               initialPosts={postsWithRoles || []}
               currentUser={user}
@@ -74,8 +82,10 @@ export default async function HomePage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <CommunitiesSidebar userId={user.id} />
+            
+            {sidebarAds[0] && <SidebarAd ad={sidebarAds[0]} />}
           </div>
         </div>
       </div>
